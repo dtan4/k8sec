@@ -2,7 +2,7 @@ BINARY := k8sec
 BINARY_DIR := bin
 
 build:
-	go build -o $(BINARY_DIR)/$(BINARY)
+	go build -ldflags="-w" -o $(BINARY_DIR)/$(BINARY)
 
 deps:
 	go get github.com/Masterminds/glide
