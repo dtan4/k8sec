@@ -22,10 +22,21 @@ rails   Opaque  database-url    "postgres://example.com:5432/dbname"
 Set secrets
 
 ``` bash
-$ k8sec set [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] NAME KEY1=VALUE1 KEY2=VALUE2
+$ k8sec set [--base64] [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] NAME KEY1=VALUE1 KEY2=VALUE2
 
 # Example
 $ k8sec set rails RAILS_ENV=production
+rails
+
+# Pass base64-encoded value
+$ echo dtan4 | base64
+ZHRhbjQK
+$ k8sec set --base64 rails foo=ZHRhbjQK
+rails
+$ k8sec list rails
+NAME    TYPE    KEY             VALUE
+rails   Opaque  database-url    "postgres://example.com:5432/dbname"
+rails   Opaque  foo             "dtan4\n"
 ```
 
 ### `k8sec unset`

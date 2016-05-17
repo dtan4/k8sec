@@ -1,6 +1,7 @@
 package command
 
 import (
+	"encoding/base64"
 	"flag"
 	"fmt"
 	"os"
@@ -17,15 +18,17 @@ type SetCommand struct {
 
 func (c *SetCommand) Run(args []string) int {
 	var (
-		arguments  []string
-		kubeconfig string
-		kubeClient *client.Client
-		namespace  string
+		arguments     []string
+		base64encoded bool
+		kubeconfig    string
+		kubeClient    *client.Client
+		namespace     string
 	)
 
 	flags := flag.NewFlagSet("list", flag.ContinueOnError)
 	flags.Usage = func() {}
 
+	flags.BoolVar(&base64encoded, "base64", false, "If true, values are parsed as base64-encoded string (Default: false)")
 	flags.StringVar(&kubeconfig, "kubeconfig", "", "Path to the kubeconfig file (Default: ~/.kube/config)")
 	flags.StringVar(&namespace, "namespace", "", "Namespace scope (Default: default)")
 
@@ -61,7 +64,19 @@ func (c *SetCommand) Run(args []string) int {
 		}
 
 		k, v := ary[0], ary[1]
-		data[k] = []byte(v)
+
+		if base64encoded {
+			_v, err := base64.StdEncoding.DecodeString(v)
+
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				return 1
+			}
+
+			data[k] = _v
+		} else {
+			data[k] = []byte(v)
+		}
 	}
 
 	kubeClient, err := k8s.NewKubeClient(kubeconfig)
