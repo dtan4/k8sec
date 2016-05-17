@@ -6,4 +6,3 @@ import:
   - pkg/client/unversioned
   - pkg/api
   - pkg/client/unversioned/clientcmd
-  - pkg/fields

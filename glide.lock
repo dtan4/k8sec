@@ -1,5 +1,5 @@
-hash: 36321921f91f3963894b1e5ba55138de38a1ec4b7d13d032f436c06665af8fe8
-updated: 2016-05-17T18:22:51.194638642+09:00
+hash: b62a04ea9c444936a9420b61bd24cfe1191376262f95ef4ff44e5b5ff50d3b89
+updated: 2016-05-17T20:56:01.912979574+09:00
 imports:
 - name: bitbucket.org/ww/goautoneg
   version: 75cd24fc2f2c
@@ -219,12 +219,12 @@ imports:
   - pkg/client/unversioned
   - pkg/api
   - pkg/client/unversioned/clientcmd
-  - pkg/fields
   - pkg/api/meta
   - pkg/api/resource
   - pkg/api/unversioned
   - pkg/auth/user
   - pkg/conversion
+  - pkg/fields
   - pkg/labels
   - pkg/runtime
   - pkg/runtime/serializer

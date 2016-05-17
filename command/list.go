@@ -11,7 +11,6 @@ import (
 	"github.com/dtan4/k8sec/k8s"
 	"k8s.io/kubernetes/pkg/api"
 	client "k8s.io/kubernetes/pkg/client/unversioned"
-	"k8s.io/kubernetes/pkg/fields"
 )
 
 type ListCommand struct {
@@ -20,11 +19,10 @@ type ListCommand struct {
 
 func (c *ListCommand) Run(args []string) int {
 	var (
-		arguments     []string
-		kubeconfig    string
-		kubeClient    *client.Client
-		fieldSelector fields.Selector
-		namespace     string
+		arguments  []string
+		kubeconfig string
+		kubeClient *client.Client
+		namespace  string
 	)
 
 	flags := flag.NewFlagSet("list", flag.ContinueOnError)
@@ -43,26 +41,16 @@ func (c *ListCommand) Run(args []string) int {
 		flags.Parse(flags.Args()[1:])
 	}
 
+	if len(arguments) > 1 {
+		fmt.Fprintln(os.Stderr, "Too many arguments.")
+		return 1
+	}
+
 	if namespace == "" {
 		namespace = api.NamespaceDefault
 	}
 
-	if len(arguments) >= 1 {
-		fieldSelector = fields.Set{api.ObjectNameField: arguments[0]}.AsSelector()
-	} else {
-		fieldSelector = fields.Everything()
-	}
-
 	kubeClient, err := k8s.NewKubeClient(kubeconfig)
-
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return 1
-	}
-
-	secrets, err := kubeClient.Secrets(namespace).List(api.ListOptions{
-		FieldSelector: fieldSelector,
-	})
 
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -73,9 +61,29 @@ func (c *ListCommand) Run(args []string) int {
 	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
 	fmt.Fprintln(w, strings.Join([]string{"NAME", "TYPE", "KEY", "VALUE"}, "\t"))
 
-	for _, secret := range secrets.Items {
+	if len(arguments) == 1 {
+		secret, err := kubeClient.Secrets(namespace).Get(arguments[0])
+
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return 1
+		}
+
 		for key, value := range secret.Data {
 			fmt.Fprintln(w, strings.Join([]string{secret.Name, string(secret.Type), key, strconv.Quote(string(value))}, "\t"))
+		}
+	} else {
+		secrets, err := kubeClient.Secrets(namespace).List(api.ListOptions{})
+
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return 1
+		}
+
+		for _, secret := range secrets.Items {
+			for key, value := range secret.Data {
+				fmt.Fprintln(w, strings.Join([]string{secret.Name, string(secret.Type), key, strconv.Quote(string(value))}, "\t"))
+			}
 		}
 	}
 
