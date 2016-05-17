@@ -81,11 +81,11 @@ func (c *ListCommand) Run(args []string) int {
 
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
-	fmt.Fprintln(w, strings.Join([]string{"NAMESPACE", "NAME", "KEY", "VALUE"}, "\t"))
+	fmt.Fprintln(w, strings.Join([]string{"NAME", "TYPE", "KEY", "VALUE"}, "\t"))
 
 	for _, secret := range secrets.Items {
 		for key, value := range secret.Data {
-			fmt.Fprintln(w, strings.Join([]string{secret.Namespace, secret.Name, key, strconv.Quote(string(value))}, "\t"))
+			fmt.Fprintln(w, strings.Join([]string{secret.Name, string(secret.Type), key, strconv.Quote(string(value))}, "\t"))
 		}
 	}
 
