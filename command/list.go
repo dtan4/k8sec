@@ -1,6 +1,7 @@
 package command
 
 import (
+	"encoding/base64"
 	"flag"
 	"fmt"
 	"os"
@@ -19,15 +20,18 @@ type ListCommand struct {
 
 func (c *ListCommand) Run(args []string) int {
 	var (
-		arguments  []string
-		kubeconfig string
-		kubeClient *client.Client
-		namespace  string
+		arguments    []string
+		base64encode bool
+		kubeconfig   string
+		kubeClient   *client.Client
+		namespace    string
+		v            string
 	)
 
 	flags := flag.NewFlagSet("list", flag.ContinueOnError)
 	flags.Usage = func() {}
 
+	flags.BoolVar(&base64encode, "base64", false, "If true, values are shown as base64-encoded string (Default: false)")
 	flags.StringVar(&kubeconfig, "kubeconfig", "", "Path to the kubeconfig file (Default: ~/.kube/config)")
 	flags.StringVar(&namespace, "namespace", "", "Namespace scope (Default: default)")
 
@@ -70,7 +74,13 @@ func (c *ListCommand) Run(args []string) int {
 		}
 
 		for key, value := range secret.Data {
-			fmt.Fprintln(w, strings.Join([]string{secret.Name, string(secret.Type), key, strconv.Quote(string(value))}, "\t"))
+			if base64encode {
+				v = base64.StdEncoding.EncodeToString(value)
+			} else {
+				v = strconv.Quote(string(value))
+			}
+
+			fmt.Fprintln(w, strings.Join([]string{secret.Name, string(secret.Type), key, v}, "\t"))
 		}
 	} else {
 		secrets, err := kubeClient.Secrets(namespace).List(api.ListOptions{})
@@ -82,7 +92,13 @@ func (c *ListCommand) Run(args []string) int {
 
 		for _, secret := range secrets.Items {
 			for key, value := range secret.Data {
-				fmt.Fprintln(w, strings.Join([]string{secret.Name, string(secret.Type), key, strconv.Quote(string(value))}, "\t"))
+				if base64encode {
+					v = base64.StdEncoding.EncodeToString(value)
+				} else {
+					v = strconv.Quote(string(value))
+				}
+
+				fmt.Fprintln(w, strings.Join([]string{secret.Name, string(secret.Type), key, v}, "\t"))
 			}
 		}
 	}

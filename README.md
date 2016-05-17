@@ -15,6 +15,11 @@ $ k8sec list [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [NAME]
 $ k8sec list rails
 NAME    TYPE    KEY             VALUE
 rails   Opaque  database-url    "postgres://example.com:5432/dbname"
+
+# Show values as base64-encoded string
+$ k8sec list --base64 rails
+NAME    TYPE    KEY             VALUE
+rails   Opaque  database-url    cG9zdGdyZXM6Ly9leGFtcGxlLmNvbTo1NDMyL2RibmFtZQ==
 ```
 
 ### `k8sec set`
