@@ -1,0 +1,3 @@
+package: github.com/dtan4/k8sec
+import:
+- package: github.com/mitchellh/cli
