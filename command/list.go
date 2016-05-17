@@ -24,12 +24,14 @@ func (c *ListCommand) Run(args []string) int {
 		kubeconfig    string
 		kubeClient    *client.Client
 		fieldSelector fields.Selector
+		namespace     string
 	)
 
 	flags := flag.NewFlagSet("list", flag.ContinueOnError)
 	flags.Usage = func() {}
 
-	flags.StringVar(&kubeconfig, "kubeconfig", "", "Path to the kubeconfig file")
+	flags.StringVar(&kubeconfig, "kubeconfig", "", "Path to the kubeconfig file (Default: ~/.kube/config)")
+	flags.StringVar(&namespace, "namespace", "", "Namespace scope (Default: default)")
 
 	if err := flags.Parse(args[0:]); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -39,6 +41,10 @@ func (c *ListCommand) Run(args []string) int {
 	for 0 < flags.NArg() {
 		arguments = append(arguments, flags.Arg(0))
 		flags.Parse(flags.Args()[1:])
+	}
+
+	if namespace == "" {
+		namespace = api.NamespaceDefault
 	}
 
 	if len(arguments) >= 1 {
@@ -54,7 +60,7 @@ func (c *ListCommand) Run(args []string) int {
 		return 1
 	}
 
-	secrets, err := kubeClient.Secrets(api.NamespaceDefault).List(api.ListOptions{
+	secrets, err := kubeClient.Secrets(namespace).List(api.ListOptions{
 		FieldSelector: fieldSelector,
 	})
 
