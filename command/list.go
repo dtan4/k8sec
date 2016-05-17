@@ -10,6 +10,7 @@ import (
 
 	"github.com/dtan4/k8sec/k8s"
 	"k8s.io/kubernetes/pkg/api"
+	client "k8s.io/kubernetes/pkg/client/unversioned"
 	"k8s.io/kubernetes/pkg/fields"
 )
 
@@ -21,6 +22,7 @@ func (c *ListCommand) Run(args []string) int {
 	var (
 		arguments     []string
 		kubeconfig    string
+		kubeClient    *client.Client
 		fieldSelector fields.Selector
 	)
 

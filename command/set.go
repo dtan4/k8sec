@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"github.com/dtan4/k8sec/k8s"
+	"k8s.io/kubernetes/pkg/api"
+	client "k8s.io/kubernetes/pkg/client/unversioned"
 )
 
 type SetCommand struct {
@@ -17,6 +19,7 @@ func (c *SetCommand) Run(args []string) int {
 	var (
 		arguments  []string
 		kubeconfig string
+		kubeClient *client.Client
 	)
 
 	flags := flag.NewFlagSet("list", flag.ContinueOnError)
@@ -39,9 +42,9 @@ func (c *SetCommand) Run(args []string) int {
 		return 1
 	}
 
-	_ = arguments[0]
+	name := arguments[0]
 
-	secrets := map[string]string{}
+	data := map[string][]byte{}
 
 	for _, kv := range arguments[1:] {
 		ary := strings.SplitN(kv, "=", 2)
@@ -52,19 +55,35 @@ func (c *SetCommand) Run(args []string) int {
 		}
 
 		k, v := ary[0], ary[1]
-		secrets[k] = v
+		data[k] = []byte(v)
 	}
 
-	_, err := k8s.NewKubeClient(kubeconfig)
+	kubeClient, err := k8s.NewKubeClient(kubeconfig)
 
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
 	}
 
-	for k, v := range secrets {
-		fmt.Println(k + ": " + v)
+	s, err := kubeClient.Secrets(api.NamespaceDefault).Get(name)
+
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
 	}
+
+	for k, v := range data {
+		s.Data[k] = v
+	}
+
+	_, err = kubeClient.Secrets(api.NamespaceDefault).Update(s)
+
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+
+	fmt.Println(s.Name)
 
 	return 0
 }
