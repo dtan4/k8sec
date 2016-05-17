@@ -9,7 +9,7 @@ CLI tool to manage [Kubernetes Secrets](http://kubernetes.io/docs/user-guide/sec
 List secrets
 
 ``` bash
-$ k8sec list [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [NAME]
+$ k8sec list [--base64] [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [NAME]
 
 # Example
 $ k8sec list rails
