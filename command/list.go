@@ -4,7 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
+	"text/tabwriter"
 
 	"k8s.io/kubernetes/pkg/api"
 	client "k8s.io/kubernetes/pkg/client/unversioned"
@@ -77,11 +79,17 @@ func (c *ListCommand) Run(args []string) int {
 		return 1
 	}
 
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
+	fmt.Fprintln(w, strings.Join([]string{"NAMESPACE", "NAME", "KEY", "VALUE"}, "\t"))
+
 	for _, secret := range secrets.Items {
 		for key, value := range secret.Data {
-			fmt.Printf("%s, %s, key=%s, value=%q\n", secret.Namespace, secret.Name, key, string(value))
+			fmt.Fprintln(w, strings.Join([]string{secret.Namespace, secret.Name, key, strconv.Quote(string(value))}, "\t"))
 		}
 	}
+
+	w.Flush()
 
 	return 0
 }
