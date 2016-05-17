@@ -1,10 +1,43 @@
 # k8sec
 
-
-
-## Description
+CLI tool to manage [Kubernetes Secrets](http://kubernetes.io/docs/user-guide/secrets/) easily.
 
 ## Usage
+
+### `k8sec list`
+
+List secrets
+
+``` bash
+$ k8sec list [--namespace NAMESPACE] [--kubeconfig KUBECONFIG] [NAME]
+
+# Example
+$ k8sec list rails
+NAME    TYPE    KEY             VALUE
+rails   Opaque  database-url    "postgres://example.com:5432/dbname"
+```
+
+### `k8sec set`
+
+Set secrets
+
+``` bash
+$ k8sec set [--namespace NAMESPACE] [--kubeconfig KUBECONFIG] NAME KEY1=VALUE1 KEY2=VALUE2
+
+# Example
+$ k8sec set rails RAILS_ENV=production
+```
+
+### `k8sec unset`
+
+Unset secrets
+
+``` bash
+$ k8sec unset [--namespace NAMESPACE] [--kubeconfig KUBECONFIG] NAME KEY1 KEY2
+
+# Example
+$ k8sec unset rails RAILS_ENV
+```
 
 ## Install
 
