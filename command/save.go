@@ -1,6 +1,8 @@
 package command
 
 import (
+	"fmt"
+	"os"
 	"strings"
 )
 
@@ -9,9 +11,9 @@ type SaveCommand struct {
 }
 
 func (c *SaveCommand) Run(args []string) int {
-	// Write your code here
+	fmt.Fprintln(os.Stderr, "save command is currently not implemented.")
 
-	return 0
+	return 1
 }
 
 func (c *SaveCommand) Synopsis() string {
