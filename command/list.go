@@ -8,9 +8,8 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	"github.com/dtan4/k8sec/k8s"
 	"k8s.io/kubernetes/pkg/api"
-	client "k8s.io/kubernetes/pkg/client/unversioned"
-	"k8s.io/kubernetes/pkg/client/unversioned/clientcmd"
 	"k8s.io/kubernetes/pkg/fields"
 )
 
@@ -46,31 +45,14 @@ func (c *ListCommand) Run(args []string) int {
 		fieldSelector = fields.Everything()
 	}
 
-	loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
-
-	if kubeconfig == "" {
-		loadingRules.ExplicitPath = clientcmd.RecommendedHomeFile
-	} else {
-		loadingRules.ExplicitPath = kubeconfig
-	}
-
-	loader := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, &clientcmd.ConfigOverrides{})
-
-	clientConfig, err := loader.ClientConfig()
+	kubeClient, err := k8s.NewKubeClient(kubeconfig)
 
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
 	}
 
-	kubeclient, err := client.New(clientConfig)
-
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return 1
-	}
-
-	secrets, err := kubeclient.Secrets(api.NamespaceDefault).List(api.ListOptions{
+	secrets, err := kubeClient.Secrets(api.NamespaceDefault).List(api.ListOptions{
 		FieldSelector: fieldSelector,
 	})
 
