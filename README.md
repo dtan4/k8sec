@@ -30,7 +30,7 @@ Set secrets
 $ k8sec set [--base64] [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] NAME KEY1=VALUE1 KEY2=VALUE2
 
 # Example
-$ k8sec set rails RAILS_ENV=production
+$ k8sec set rails rails-env=production
 rails
 
 # Pass base64-encoded value
@@ -52,7 +52,7 @@ Unset secrets
 $ k8sec unset [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] NAME KEY1 KEY2
 
 # Example
-$ k8sec unset rails RAILS_ENV
+$ k8sec unset rails rails-env
 ```
 
 ## Install
