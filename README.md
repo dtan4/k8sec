@@ -9,7 +9,7 @@ CLI tool to manage [Kubernetes Secrets](http://kubernetes.io/docs/user-guide/sec
 List secrets
 
 ``` bash
-$ k8sec list [--namespace NAMESPACE] [--kubeconfig KUBECONFIG] [NAME]
+$ k8sec list [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [NAME]
 
 # Example
 $ k8sec list rails
@@ -22,7 +22,7 @@ rails   Opaque  database-url    "postgres://example.com:5432/dbname"
 Set secrets
 
 ``` bash
-$ k8sec set [--namespace NAMESPACE] [--kubeconfig KUBECONFIG] NAME KEY1=VALUE1 KEY2=VALUE2
+$ k8sec set [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] NAME KEY1=VALUE1 KEY2=VALUE2
 
 # Example
 $ k8sec set rails RAILS_ENV=production
@@ -33,7 +33,7 @@ $ k8sec set rails RAILS_ENV=production
 Unset secrets
 
 ``` bash
-$ k8sec unset [--namespace NAMESPACE] [--kubeconfig KUBECONFIG] NAME KEY1 KEY2
+$ k8sec unset [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] NAME KEY1 KEY2
 
 # Example
 $ k8sec unset rails RAILS_ENV
