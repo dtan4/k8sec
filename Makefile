@@ -36,10 +36,6 @@ endif
 $(BINARYDIR)/$(BINARY): $(SOURCES)
 	go build $(LDFLAGS) -o $(BINARYDIR)/$(BINARY)
 
-.PHONY: build
-build:
-	go build -ldflags="-w" -o $(BINARY_DIR)/$(BINARY)
-
 .PHONY: clean
 clean:
 	rm -fr $(BINARYDIR)
