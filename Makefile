@@ -82,7 +82,7 @@ package-all:
 	&& find * -type d | xargs -I {} zip -r $(BINARY)-$(VERSION)-{}.zip {}
 
 release-all: build-all package-all $(BINARYDIR)/$(GHR)
-	$(BINARYDIR)/$(GHR) -u $(GITHUB_USERNAME) --delete --replace $(VERSION) $(DISTDIR)/
+	$(BINARYDIR)/$(GHR) -u $(GITHUB_USERNAME) --replace $(VERSION) $(DISTDIR)/
 
 test:
 	go test -v .
