@@ -84,4 +84,7 @@ package-all:
 release-all: build-all package-all $(BINARYDIR)/$(GHR)
 	$(BINARYDIR)/$(GHR) -u $(GITHUB_USERNAME) --delete --replace $(VERSION) $(DISTDIR)/
 
-.PHONY: build-all clean deps install package-all release-all version
+test:
+	go test -v .
+
+.PHONY: build-all clean deps install package-all release-all test
