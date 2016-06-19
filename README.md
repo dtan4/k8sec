@@ -61,6 +61,19 @@ To install, use `go get`:
 
 ```bash
 $ go get -d github.com/dtan4/k8sec
+
+# or
+
+$ cd $GOPATH/src/github.com/dtan4/k8sec
+$ make deps
+$ make install
+```
+
+## Development
+
+```bash
+$ make deps
+$ make
 ```
 
 ## Contribution
