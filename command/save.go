@@ -19,18 +19,16 @@ type SaveCommand struct {
 
 func (c *SaveCommand) Run(args []string) int {
 	var (
-		arguments     []string
-		base64encoded bool
-		filename      string
-		kubeconfig    string
-		kubeClient    *client.Client
-		namespace     string
+		arguments  []string
+		filename   string
+		kubeconfig string
+		kubeClient *client.Client
+		namespace  string
 	)
 
 	flags := flag.NewFlagSet("list", flag.ContinueOnError)
 	flags.Usage = func() {}
 
-	flags.BoolVar(&base64encoded, "base64", false, "If true, values are parsed as base64-encoded string (Default: false)")
 	flags.StringVar(&filename, "f", "", "Path to save (Default: flush to stdout)")
 	flags.StringVar(&kubeconfig, "kubeconfig", "", "Path to the kubeconfig file (Default: ~/.kube/config)")
 	flags.StringVar(&namespace, "namespace", "", "Namespace scope (Default: default)")
