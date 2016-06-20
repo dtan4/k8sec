@@ -55,6 +55,39 @@ $ k8sec unset [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] NAME KEY1 KEY2
 $ k8sec unset rails rails-env
 ```
 
+### `k8sec load`
+
+Load from dotenv (key=value) format text
+
+``` bash
+$ k8sec save [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [-f FILENAME] NAME
+
+# Example
+$ cat .env
+database-url="postgres://example.com:5432/dbname"
+$ k8sec load -f .env rails
+
+# Load from stdin
+$ cat .env | k8sec load rails
+```
+
+### `k8sec save`
+
+Save as dotenv (key=value) format
+
+``` bash
+$ k8sec save [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [-f FILENAME] [NAME]
+
+# Example
+$ k8sec save rails
+database-url="postgres://example.com:5432/dbname"
+
+# Save as .env
+$ k8sec save -f .env rails
+$ cat .env
+database-url="postgres://example.com:5432/dbname"
+```
+
 ## Install
 
 To install, use `go get`:
