@@ -60,7 +60,7 @@ $ k8sec unset rails rails-env
 Load from dotenv (key=value) format text
 
 ``` bash
-$ k8sec save [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [-f FILENAME] NAME
+$ k8sec load [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [-f FILENAME] NAME
 
 # Example
 $ cat .env

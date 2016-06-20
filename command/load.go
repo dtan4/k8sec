@@ -127,7 +127,7 @@ func (c *LoadCommand) Synopsis() string {
 
 func (c *LoadCommand) Help() string {
 	helpText := `
-$ k8sec save [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [-f FILENAME] NAME
+$ k8sec load [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [-f FILENAME] NAME
 
 Load from dotenv (key=value) format text
 
