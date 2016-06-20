@@ -21,6 +21,7 @@ func (c *SaveCommand) Run(args []string) int {
 	var (
 		arguments     []string
 		base64encoded bool
+		filename      string
 		kubeconfig    string
 		kubeClient    *client.Client
 		namespace     string
@@ -30,6 +31,7 @@ func (c *SaveCommand) Run(args []string) int {
 	flags.Usage = func() {}
 
 	flags.BoolVar(&base64encoded, "base64", false, "If true, values are parsed as base64-encoded string (Default: false)")
+	flags.StringVar(&filename, "f", "", "Path to save (Default: flush to stdout)")
 	flags.StringVar(&kubeconfig, "kubeconfig", "", "Path to the kubeconfig file (Default: ~/.kube/config)")
 	flags.StringVar(&namespace, "namespace", "", "Namespace scope (Default: default)")
 
@@ -59,15 +61,36 @@ func (c *SaveCommand) Run(args []string) int {
 		return 1
 	}
 
-	secrets, err := kubeClient.Secrets(namespace).List(api.ListOptions{})
-
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return 1
-	}
+	var lines []string
 
 	if len(arguments) == 1 {
-		f, err := os.Create(arguments[0])
+		secret, err := kubeClient.Secrets(namespace).Get(arguments[0])
+
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return 1
+		}
+
+		for key, value := range secret.Data {
+			lines = append(lines, key+"="+strconv.Quote(string(value)))
+		}
+	} else {
+		secrets, err := kubeClient.Secrets(namespace).List(api.ListOptions{})
+
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return 1
+		}
+
+		for _, secret := range secrets.Items {
+			for key, value := range secret.Data {
+				lines = append(lines, key+"="+strconv.Quote(string(value)))
+			}
+		}
+	}
+
+	if filename != "" {
+		f, err := os.Create(filename)
 
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -78,23 +101,19 @@ func (c *SaveCommand) Run(args []string) int {
 
 		w := bufio.NewWriter(f)
 
-		for _, secret := range secrets.Items {
-			for key, value := range secret.Data {
-				_, err := w.WriteString(key + "=" + strconv.Quote(string(value)) + "\n")
+		for _, line := range lines {
+			_, err := w.WriteString(line + "\n")
 
-				if err != nil {
-					fmt.Fprintln(os.Stderr, err)
-					return 1
-				}
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				return 1
 			}
 		}
 
 		w.Flush()
 	} else {
-		for _, secret := range secrets.Items {
-			for key, value := range secret.Data {
-				fmt.Println(key + "=" + strconv.Quote(string(value)))
-			}
+		for _, line := range lines {
+			fmt.Println(line)
 		}
 	}
 
@@ -107,7 +126,18 @@ func (c *SaveCommand) Synopsis() string {
 
 func (c *SaveCommand) Help() string {
 	helpText := `
+$ k8sec save [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [-f FILENAME] [NAME]
 
+Save as dotenv format
+
+# Example
+$ k8sec save rails
+database-url="postgres://example.com:5432/dbname"
+
+# Save as .env
+$ k8sec save -f .env rails
+$ cat .env
+database-url="postgres://example.com:5432/dbname"
 `
 	return strings.TrimSpace(helpText)
 }
