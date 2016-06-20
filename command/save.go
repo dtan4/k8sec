@@ -1,6 +1,7 @@
 package command
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"os"
@@ -42,7 +43,7 @@ func (c *SaveCommand) Run(args []string) int {
 		flags.Parse(flags.Args()[1:])
 	}
 
-	if len(arguments) > 2 {
+	if len(arguments) > 1 {
 		fmt.Fprintln(os.Stderr, "Too many arguments.")
 		return 1
 	}
@@ -65,9 +66,35 @@ func (c *SaveCommand) Run(args []string) int {
 		return 1
 	}
 
-	for _, secret := range secrets.Items {
-		for key, value := range secret.Data {
-			fmt.Println(key + "=" + strconv.Quote(string(value)))
+	if len(arguments) == 1 {
+		f, err := os.Create(arguments[0])
+
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return 1
+		}
+
+		defer f.Close()
+
+		w := bufio.NewWriter(f)
+
+		for _, secret := range secrets.Items {
+			for key, value := range secret.Data {
+				_, err := w.WriteString(key + "=" + strconv.Quote(string(value)) + "\n")
+
+				if err != nil {
+					fmt.Fprintln(os.Stderr, err)
+					return 1
+				}
+			}
+		}
+
+		w.Flush()
+	} else {
+		for _, secret := range secrets.Items {
+			for key, value := range secret.Data {
+				fmt.Println(key + "=" + strconv.Quote(string(value)))
+			}
 		}
 	}
 
@@ -75,7 +102,7 @@ func (c *SaveCommand) Run(args []string) int {
 }
 
 func (c *SaveCommand) Synopsis() string {
-	return ""
+	return "Save as dotenv format"
 }
 
 func (c *SaveCommand) Help() string {
