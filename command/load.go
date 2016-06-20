@@ -122,12 +122,22 @@ func (c *LoadCommand) Run(args []string) int {
 }
 
 func (c *LoadCommand) Synopsis() string {
-	return ""
+	return "Load dotenv format text"
 }
 
 func (c *LoadCommand) Help() string {
 	helpText := `
+$ k8sec save [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [-f FILENAME] NAME
 
+Load dotenv format text
+
+# Example
+$ cat .env
+database-url="postgres://example.com:5432/dbname"
+$ k8sec load -f .env rails
+
+# Load from stdin
+$ cat .env | k8sec load rails
 `
 	return strings.TrimSpace(helpText)
 }
