@@ -54,6 +54,7 @@ func (c *LoadCommand) Run(args []string) int {
 		namespace = api.NamespaceDefault
 	}
 
+	var sc *bufio.Scanner
 	data := map[string][]byte{}
 
 	if filename != "" {
@@ -66,28 +67,30 @@ func (c *LoadCommand) Run(args []string) int {
 
 		defer f.Close()
 
-		sc := bufio.NewScanner(f)
+		sc = bufio.NewScanner(f)
+	} else {
+		sc = bufio.NewScanner(os.Stdin)
+	}
 
-		for sc.Scan() {
-			line := sc.Text()
-			ary := strings.SplitN(line, "=", 2)
+	for sc.Scan() {
+		line := sc.Text()
+		ary := strings.SplitN(line, "=", 2)
 
-			if len(ary) != 2 {
-				fmt.Fprintln(os.Stderr, "Line should be key=value format. Given line: "+line)
-				return 1
-			}
-
-			k, v := ary[0], ary[1]
-
-			_v, err := strconv.Unquote(v)
-
-			if err != nil {
-				// Parse as is
-				_v = v
-			}
-
-			data[k] = []byte(_v)
+		if len(ary) != 2 {
+			fmt.Fprintln(os.Stderr, "Line should be key=value format. Given line: "+line)
+			return 1
 		}
+
+		k, v := ary[0], ary[1]
+
+		_v, err := strconv.Unquote(v)
+
+		if err != nil {
+			// Parse as is
+			_v = v
+		}
+
+		data[k] = []byte(_v)
 	}
 
 	kubeClient, err := k8s.NewKubeClient(kubeconfig)
