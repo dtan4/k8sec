@@ -88,12 +88,17 @@ func (c *UnsetCommand) Run(args []string) int {
 }
 
 func (c *UnsetCommand) Synopsis() string {
-	return ""
+	return "Unset secrets"
 }
 
 func (c *UnsetCommand) Help() string {
 	helpText := `
+$ k8sec unset [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] NAME KEY1 KEY2
 
+Unset secrets
+
+# Example
+$ k8sec unset rails rails-env
 `
 	return strings.TrimSpace(helpText)
 }

@@ -109,12 +109,24 @@ func (c *ListCommand) Run(args []string) int {
 }
 
 func (c *ListCommand) Synopsis() string {
-	return ""
+	return "List secrets"
 }
 
 func (c *ListCommand) Help() string {
 	helpText := `
+$ k8sec list [--base64] [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [NAME]
 
+List secrets
+
+# Example
+$ k8sec list rails
+NAME    TYPE    KEY             VALUE
+rails   Opaque  database-url    "postgres://example.com:5432/dbname"
+
+# Show values as base64-encoded string
+$ k8sec list --base64 rails
+NAME    TYPE    KEY             VALUE
+rails   Opaque  database-url    cG9zdGdyZXM6Ly9leGFtcGxlLmNvbTo1NDMyL2RibmFtZQ==
 `
 	return strings.TrimSpace(helpText)
 }

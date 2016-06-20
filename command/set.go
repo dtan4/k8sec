@@ -110,12 +110,28 @@ func (c *SetCommand) Run(args []string) int {
 }
 
 func (c *SetCommand) Synopsis() string {
-	return ""
+	return "Set secrets"
 }
 
 func (c *SetCommand) Help() string {
 	helpText := `
+$ k8sec set [--base64] [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] NAME KEY1=VALUE1 KEY2=VALUE2
 
+Set secrets
+
+# Example
+$ k8sec set rails rails-env=production
+rails
+
+# Pass base64-encoded value
+$ echo dtan4 | base64
+ZHRhbjQK
+$ k8sec set --base64 rails foo=ZHRhbjQK
+rails
+$ k8sec list rails
+NAME    TYPE    KEY             VALUE
+rails   Opaque  database-url    "postgres://example.com:5432/dbname"
+rails   Opaque  foo             "dtan4\n"
 `
 	return strings.TrimSpace(helpText)
 }
