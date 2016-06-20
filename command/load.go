@@ -122,14 +122,14 @@ func (c *LoadCommand) Run(args []string) int {
 }
 
 func (c *LoadCommand) Synopsis() string {
-	return "Load dotenv format text"
+	return "Load from dotenv (key=value) format text"
 }
 
 func (c *LoadCommand) Help() string {
 	helpText := `
 $ k8sec save [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [-f FILENAME] NAME
 
-Load dotenv format text
+Load from dotenv (key=value) format text
 
 # Example
 $ cat .env

@@ -119,7 +119,7 @@ func (c *SaveCommand) Run(args []string) int {
 }
 
 func (c *SaveCommand) Synopsis() string {
-	return "Save as dotenv format"
+	return "Save as dotenv (key=value) format"
 }
 
 func (c *SaveCommand) Help() string {
