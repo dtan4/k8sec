@@ -8,7 +8,12 @@ CLI tool to manage [Kubernetes Secrets](http://kubernetes.io/docs/user-guide/sec
 
 ### Using Homebrew (OS X only)
 
-Preparing... :construction_worker:
+Formula is available at [dtan4/homebrew-dtan4](https://github.com/dtan4/homebrew-dtan4).
+
+```bash
+$ brew tap dtan4/dtan4
+$ brew install k8sec
+```
 
 ### Precompiled binary
 
