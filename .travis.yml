@@ -1,11 +1,9 @@
 language: go
 go:
-  - '1.5'
   - '1.6'
+  - '1.7'
 before_install:
   - mkdir -p $GOPATH/bin
-env:
-  - GO15VENDOREXPERIMENT=1
 install:
   - make deps
 script:
@@ -15,4 +13,4 @@ deploy:
     script: make release-all
     on:
       tags: true
-      go: '1.6'
+      go: '1.7'
