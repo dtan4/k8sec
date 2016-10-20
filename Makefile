@@ -1,11 +1,8 @@
 NAME := k8sec
-
-VERSION := $(patsubst "%",%,$(lastword $(shell grep "\tVersion" version.go)))
+VERSION := v0.1.0
 REVISION := $(shell git rev-parse --short HEAD)
-BUILDTIME := $(shell date '+%Y/%m/%d %H:%M:%S %Z')
-GOVERSION := $(subst go version ,,$(shell go version))
 
-LDFLAGS := -ldflags="-w -X \"main.GitCommit=$(REVISION)\" -X \"main.BuildTime=$(BUILDTIME)\" -X \"main.GoVersion=$(GOVERSION)\""
+LDFLAGS := -ldflags="-w -X \"main.Version=$(VERSION)\" -X \"main.Revision=$(REVISION)\""
 
 DIST_DIRS := find * -type d -exec
 
