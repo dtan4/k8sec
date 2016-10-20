@@ -18,19 +18,19 @@ GITHUB_USERNAME := dtan4
 bin/$(NAME): deps
 	go build $(LDFLAGS) -o bin/$(NAME)
 
-build-all:
-	go get github.com/mitchellh/gox
-	gox -verbose \
-		$(LDFLAGS) \
-		-os="linux darwin windows " \
-		-arch="amd64 386" \
-		-output="$(DISTDIR)/{{.OS}}-{{.Arch}}/{{.Dir}}" .
-
 .PHONY: clean
 clean:
 	rm -rf bin/*
 	rm -rf dist/*
 	rm -rf vendor/*
+
+.PHONY: cross-build
+cross-build: deps
+	for os in darwin linux windows; do \
+		for arch in amd64 386; do \
+			GOOS=$$os GOARCH=$$arch go build $(LDFLAGS) -o dist/$$os-$$arch/$(NAME); \
+		done; \
+	done
 
 .PHONY: deps
 deps: glide
