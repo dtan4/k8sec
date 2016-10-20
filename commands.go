@@ -37,7 +37,7 @@ func Commands(meta *command.Meta) map[string]cli.CommandFactory {
 			return &command.VersionCommand{
 				Meta:     *meta,
 				Version:  Version,
-				Revision: GitCommit,
+				Revision: Revision,
 				Name:     Name,
 			}, nil
 		},
