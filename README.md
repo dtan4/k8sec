@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/dtan4/k8sec.svg?branch=master)](https://travis-ci.org/dtan4/k8sec)
 
-CLI tool to manage [Kubernetes Secrets](http://kubernetes.io/docs/user-guide/secrets/) easily.
+CLI tool to manage [Kubernetes Secrets](http://kubernetes.io/docs/user-guide/secrets/) easily
 
 ## Installation
 
