@@ -1,10 +1,11 @@
+NAME := k8sec
+
 VERSION := $(patsubst "%",%,$(lastword $(shell grep "\tVersion" version.go)))
 REVISION := $(shell git rev-parse --short HEAD)
 BUILDTIME := $(shell date '+%Y/%m/%d %H:%M:%S %Z')
 GOVERSION := $(subst go version ,,$(shell go version))
 
 BINARYDIR := bin
-BINARY := k8sec
 
 LDFLAGS := -ldflags="-w -X \"main.GitCommit=$(REVISION)\" -X \"main.BuildTime=$(BUILDTIME)\" -X \"main.GoVersion=$(GOVERSION)\""
 
@@ -15,7 +16,7 @@ DISTDIR := dist
 
 GITHUB_USERNAME := dtan4
 
-.DEFAULT_GOAL := $(BINARYDIR)/$(BINARY)
+.DEFAULT_GOAL := bin/$(NAME)
 
 $(BINARYDIR)/$(GHR):
 ifeq ($(shell uname),Darwin)
@@ -32,8 +33,8 @@ else
 	rm ./ghr.zip
 endif
 
-$(BINARYDIR)/$(BINARY): deps
-	go build $(LDFLAGS) -o $(BINARYDIR)/$(BINARY)
+bin/$(NAME): deps
+	go build $(LDFLAGS) -o bin/$(NAME)
 
 build-all:
 	go get github.com/mitchellh/gox
