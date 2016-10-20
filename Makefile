@@ -58,8 +58,9 @@ ifeq ($(shell command -v glide 2> /dev/null),)
 	curl https://glide.sh/get | sh
 endif
 
-install: $(BINARYDIR)/$(BINARY)
-	go install
+.PHONY: install
+install: deps
+	go install $(LDFLAGS)
 
 package-all:
 	cd $(DISTDIR) \
@@ -72,4 +73,4 @@ release-all: build-all package-all $(BINARYDIR)/$(GHR)
 test:
 	go test -v .
 
-.PHONY: build-all clean install package-all release-all test
+.PHONY: build-all clean package-all release-all test
