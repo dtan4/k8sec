@@ -9,29 +9,11 @@ BINARYDIR := bin
 
 LDFLAGS := -ldflags="-w -X \"main.GitCommit=$(REVISION)\" -X \"main.BuildTime=$(BUILDTIME)\" -X \"main.GoVersion=$(GOVERSION)\""
 
-GHR := ghr
-GHR_VERSION := v0.4.0
-
 DISTDIR := dist
 
 GITHUB_USERNAME := dtan4
 
 .DEFAULT_GOAL := bin/$(NAME)
-
-$(BINARYDIR)/$(GHR):
-ifeq ($(shell uname),Darwin)
-	curl -fL https://github.com/tcnksm/ghr/releases/download/$(GHR_VERSION)/ghr_$(GHR_VERSION)_darwin_amd64.zip -o ghr.zip
-	unzip ghr.zip
-	if [ ! -d $(BINARYDIR) ]; then mkdir $(BINARYDIR); fi
-	mv ./ghr $(BINARYDIR)/$(GHR)
-	rm ./ghr.zip
-else
-	curl -fL https://github.com/tcnksm/ghr/releases/download/$(GHR_VERSION)/ghr-$(GHR_VERSION)-linux_amd64.zip -o ghr.zip
-	unzip ghr.zip
-	if [ ! -d $(BINARYDIR) ]; then mkdir $(BINARYDIR); fi
-	mv ./ghr $(BINARYDIR)/$(GHR)
-	rm ./ghr.zip
-endif
 
 bin/$(NAME): deps
 	go build $(LDFLAGS) -o bin/$(NAME)
@@ -68,9 +50,6 @@ package-all:
 	cd $(DISTDIR) \
 	&& find * -type d | xargs -I {} tar czf $(BINARY)-$(VERSION)-{}.tar.gz {} \
 	&& find * -type d | xargs -I {} zip -r $(BINARY)-$(VERSION)-{}.zip {}
-
-release-all: build-all package-all $(BINARYDIR)/$(GHR)
-	$(BINARYDIR)/$(GHR) -u $(GITHUB_USERNAME) --replace $(VERSION) $(DISTDIR)/
 
 .PHONY: test
 test:
