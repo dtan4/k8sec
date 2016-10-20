@@ -5,13 +5,9 @@ REVISION := $(shell git rev-parse --short HEAD)
 BUILDTIME := $(shell date '+%Y/%m/%d %H:%M:%S %Z')
 GOVERSION := $(subst go version ,,$(shell go version))
 
-BINARYDIR := bin
-
 LDFLAGS := -ldflags="-w -X \"main.GitCommit=$(REVISION)\" -X \"main.BuildTime=$(BUILDTIME)\" -X \"main.GoVersion=$(GOVERSION)\""
 
-DISTDIR := dist
-
-GITHUB_USERNAME := dtan4
+DIST_DIRS := find * -type d -exec
 
 .DEFAULT_GOAL := bin/$(NAME)
 
@@ -36,6 +32,15 @@ cross-build: deps
 deps: glide
 	glide install
 
+.PHONY: dist
+dist:
+	cd dist && \
+	$(DIST_DIRS) cp ../LICENSE {} \; && \
+	$(DIST_DIRS) cp ../README.md {} \; && \
+	$(DIST_DIRS) tar -zcf $(NAME)-$(VERSION)-{}.tar.gz {} \; && \
+	$(DIST_DIRS) zip -r $(NAME)-$(VERSION)-{}.zip {} \; && \
+	cd ..
+
 .PHONY: glide
 glide:
 ifeq ($(shell command -v glide 2> /dev/null),)
@@ -46,13 +51,6 @@ endif
 install: deps
 	go install $(LDFLAGS)
 
-package-all:
-	cd $(DISTDIR) \
-	&& find * -type d | xargs -I {} tar czf $(BINARY)-$(VERSION)-{}.tar.gz {} \
-	&& find * -type d | xargs -I {} zip -r $(BINARY)-$(VERSION)-{}.zip {}
-
 .PHONY: test
 test:
 	go test -cover -v `glide novendor`
-
-.PHONY: build-all package-all release-all
