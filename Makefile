@@ -72,7 +72,8 @@ package-all:
 release-all: build-all package-all $(BINARYDIR)/$(GHR)
 	$(BINARYDIR)/$(GHR) -u $(GITHUB_USERNAME) --replace $(VERSION) $(DISTDIR)/
 
+.PHONY: test
 test:
-	go test -v .
+	go test -cover -v `glide novendor`
 
-.PHONY: build-all package-all release-all test
+.PHONY: build-all package-all release-all
