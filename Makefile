@@ -44,9 +44,11 @@ build-all:
 		-arch="amd64 386" \
 		-output="$(DISTDIR)/{{.OS}}-{{.Arch}}/{{.Dir}}" .
 
+.PHONY: clean
 clean:
-	rm -fr $(BINARYDIR)
-	rm -fr $(DISTDIR)
+	rm -rf bin/*
+	rm -rf dist/*
+	rm -rf vendor/*
 
 .PHONY: deps
 deps: glide
@@ -73,4 +75,4 @@ release-all: build-all package-all $(BINARYDIR)/$(GHR)
 test:
 	go test -v .
 
-.PHONY: build-all clean package-all release-all test
+.PHONY: build-all package-all release-all test
