@@ -1,6 +1,27 @@
 # k8sec
 
-CLI tool to manage [Kubernetes Secrets](http://kubernetes.io/docs/user-guide/secrets/) easily.
+[![Build Status](https://travis-ci.org/dtan4/k8sec.svg?branch=master)](https://travis-ci.org/dtan4/k8sec)
+
+CLI tool to manage [Kubernetes Secrets](http://kubernetes.io/docs/user-guide/secrets/) easily
+
+## Installation
+
+### Using Homebrew (OS X only)
+
+Preparing... :construction_worker:
+
+### Precompiled binary
+
+Precompiled binaries for Windows, OS X, Linux are available at [Releases](https://github.com/dtan4/k8sec/releases).
+
+### From source
+
+```bash
+$ go get -d github.com/dtan4/k8sec
+$ cd $GOPATH/src/github.com/dtan4/k8sec
+$ make
+$ make install
+```
 
 ## Usage
 
@@ -86,27 +107,6 @@ database-url="postgres://example.com:5432/dbname"
 $ k8sec save -f .env rails
 $ cat .env
 database-url="postgres://example.com:5432/dbname"
-```
-
-## Install
-
-To install, use `go get`:
-
-```bash
-$ go get -d github.com/dtan4/k8sec
-
-# or
-
-$ cd $GOPATH/src/github.com/dtan4/k8sec
-$ make deps
-$ make install
-```
-
-## Development
-
-```bash
-$ make deps
-$ make
 ```
 
 ## Contribution
