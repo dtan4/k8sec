@@ -1,19 +1,7 @@
-## 0.1.0 (2016-05-17)
+# [v0.1.1](https://github.com/dtan4/k8sec/releases/tag/v0.1.1) (2016-10-21)
 
-Initial release
+Initial stable binary release.
 
-### Added
+# [v0.1.0](https://github.com/dtan4/k8sec/releases/tag/v0.1.0) (2016-07-19)
 
-- Add Fundamental features
-
-### Deprecated
-
-- Nothing
-
-### Removed
-
-- Nothing
-
-### Fixed
-
-- Nothing
+Initial release.
