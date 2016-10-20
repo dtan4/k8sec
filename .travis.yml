@@ -2,6 +2,8 @@ language: go
 go:
   - '1.5'
   - '1.6'
+before_install:
+  - mkdir -p $GOPATH/bin
 env:
   - GO15VENDOREXPERIMENT=1
 install:
