@@ -2,7 +2,7 @@ NAME := k8sec
 VERSION := v0.1.0
 REVISION := $(shell git rev-parse --short HEAD)
 
-LDFLAGS := -ldflags="-w -X \"main.Version=$(VERSION)\" -X \"main.Revision=$(REVISION)\""
+LDFLAGS := -ldflags="-s -w -X \"main.Version=$(VERSION)\" -X \"main.Revision=$(REVISION)\""
 
 DIST_DIRS := find * -type d -exec
 
