@@ -3,6 +3,9 @@ go:
   - '1.6'
   - '1.7'
 before_install:
+  - sudo add-apt-repository ppa:masterminds/glide -y
+  - sudo apt-get update -q
+  - sudo apt-get install glide -y
   - mkdir -p $GOPATH/bin
 install:
   - make deps
