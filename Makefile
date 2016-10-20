@@ -8,14 +8,8 @@ BINARY := k8sec
 
 LDFLAGS := -ldflags="-w -X \"main.GitCommit=$(REVISION)\" -X \"main.BuildTime=$(BUILDTIME)\" -X \"main.GoVersion=$(GOVERSION)\""
 
-SOURCEDIR := .
-SOURCES := $(shell find $(SOURCEDIR) -name '*.go' -type f)
-
 GHR := ghr
 GHR_VERSION := v0.4.0
-
-GLIDE := glide
-GLIDE_VERSION := 0.10.2
 
 DISTDIR := dist
 
@@ -38,24 +32,7 @@ else
 	rm ./ghr.zip
 endif
 
-$(BINARYDIR)/$(GLIDE):
-ifeq ($(shell uname),Darwin)
-	curl -fL https://github.com/Masterminds/glide/releases/download/$(GLIDE_VERSION)/glide-$(GLIDE_VERSION)-darwin-amd64.zip -o glide.zip
-	unzip glide.zip
-	if [ ! -d $(BINARYDIR) ]; then mkdir $(BINARYDIR); fi
-	mv ./darwin-amd64/glide $(BINARYDIR)/$(GLIDE)
-	rm -fr ./darwin-amd64
-	rm ./glide.zip
-else
-	curl -fL https://github.com/Masterminds/glide/releases/download/$(GLIDE_VERSION)/glide-$(GLIDE_VERSION)-linux-amd64.zip -o glide.zip
-	unzip glide.zip
-	if [ ! -d $(BINARYDIR) ]; then mkdir $(BINARYDIR); fi
-	mv ./linux-amd64/glide $(BINARYDIR)/$(GLIDE)
-	rm -fr ./linux-amd64
-	rm ./glide.zip
-endif
-
-$(BINARYDIR)/$(BINARY): $(SOURCES)
+$(BINARYDIR)/$(BINARY): deps
 	go build $(LDFLAGS) -o $(BINARYDIR)/$(BINARY)
 
 build-all:
@@ -70,8 +47,15 @@ clean:
 	rm -fr $(BINARYDIR)
 	rm -fr $(DISTDIR)
 
-deps: $(BINARYDIR)/$(GLIDE)
-	$(BINARYDIR)/$(GLIDE) install
+.PHONY: deps
+deps: glide
+	glide install
+
+.PHONY: glide
+glide:
+ifeq ($(shell command -v glide 2> /dev/null),)
+	curl https://glide.sh/get | sh
+endif
 
 install: $(BINARYDIR)/$(BINARY)
 	go install
@@ -87,4 +71,4 @@ release-all: build-all package-all $(BINARYDIR)/$(GHR)
 test:
 	go test -v .
 
-.PHONY: build-all clean deps install package-all release-all test
+.PHONY: build-all clean install package-all release-all test
