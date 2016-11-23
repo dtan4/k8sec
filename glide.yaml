@@ -1,10 +1,9 @@
 package: github.com/dtan4/k8sec
 import:
 - package: github.com/mitchellh/cli
-- package: k8s.io/kubernetes
-  subpackages:
-  - pkg/client/unversioned
-  - pkg/api
-  - pkg/client/unversioned/clientcmd
 - package: k8s.io/client-go
   version: ~2.0.0-alpha.0
+  subpackages:
+  - pkg/api/v1
+  - kubernetes
+  - tools/clientcmd
