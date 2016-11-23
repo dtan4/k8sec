@@ -24,7 +24,7 @@ Precompiled binaries for Windows, OS X, Linux are available at [Releases](https:
 ```bash
 $ go get -d github.com/dtan4/k8sec
 $ cd $GOPATH/src/github.com/dtan4/k8sec
-$ make
+$ make deps
 $ make install
 ```
 

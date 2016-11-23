@@ -2,13 +2,14 @@ NAME := k8sec
 VERSION := v0.1.1
 REVISION := $(shell git rev-parse --short HEAD)
 
+SRCS    := $(shell find . -type f -name '*.go')
 LDFLAGS := -ldflags="-s -w -X \"main.Version=$(VERSION)\" -X \"main.Revision=$(REVISION)\""
 
 DIST_DIRS := find * -type d -exec
 
 .DEFAULT_GOAL := bin/$(NAME)
 
-bin/$(NAME): deps
+bin/$(NAME): $(SRCS)
 	go build $(LDFLAGS) -o bin/$(NAME)
 
 .PHONY: clean
@@ -45,7 +46,7 @@ ifeq ($(shell command -v glide 2> /dev/null),)
 endif
 
 .PHONY: install
-install: deps
+install:
 	go install $(LDFLAGS)
 
 .PHONY: test
