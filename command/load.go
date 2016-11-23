@@ -9,8 +9,7 @@ import (
 	"strings"
 
 	"github.com/dtan4/k8sec/k8s"
-	"k8s.io/kubernetes/pkg/api"
-	client "k8s.io/kubernetes/pkg/client/unversioned"
+	"k8s.io/client-go/pkg/api/v1"
 )
 
 type LoadCommand struct {
@@ -22,7 +21,6 @@ func (c *LoadCommand) Run(args []string) int {
 		arguments  []string
 		filename   string
 		kubeconfig string
-		kubeClient *client.Client
 		namespace  string
 	)
 
@@ -31,7 +29,7 @@ func (c *LoadCommand) Run(args []string) int {
 
 	flags.StringVar(&filename, "f", "", "Path to save (Default: flush to stdout)")
 	flags.StringVar(&kubeconfig, "kubeconfig", "", "Path to the kubeconfig file (Default: ~/.kube/config)")
-	flags.StringVar(&namespace, "namespace", "", "Namespace scope (Default: default)")
+	flags.StringVar(&namespace, "namespace", v1.NamespaceDefault, "Namespace scope")
 
 	if err := flags.Parse(args[0:]); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -50,21 +48,15 @@ func (c *LoadCommand) Run(args []string) int {
 
 	name := arguments[0]
 
-	if namespace == "" {
-		namespace = api.NamespaceDefault
-	}
-
 	var sc *bufio.Scanner
 	data := map[string][]byte{}
 
 	if filename != "" {
 		f, err := os.Open(filename)
-
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return 1
 		}
-
 		defer f.Close()
 
 		sc = bufio.NewScanner(f)
@@ -84,7 +76,6 @@ func (c *LoadCommand) Run(args []string) int {
 		k, v := ary[0], ary[1]
 
 		_v, err := strconv.Unquote(v)
-
 		if err != nil {
 			// Parse as is
 			_v = v
@@ -93,15 +84,13 @@ func (c *LoadCommand) Run(args []string) int {
 		data[k] = []byte(_v)
 	}
 
-	kubeClient, err := k8s.NewKubeClient(kubeconfig)
-
+	clientset, err := k8s.NewKubeClient(kubeconfig)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
 	}
 
-	s, err := kubeClient.Secrets(namespace).Get(name)
-
+	s, err := clientset.Core().Secrets(namespace).Get(name)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
@@ -111,8 +100,7 @@ func (c *LoadCommand) Run(args []string) int {
 		s.Data[k] = v
 	}
 
-	_, err = kubeClient.Secrets(namespace).Update(s)
-
+	_, err = clientset.Core().Secrets(namespace).Update(s)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1

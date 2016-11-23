@@ -10,8 +10,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/dtan4/k8sec/k8s"
-	"k8s.io/kubernetes/pkg/api"
-	client "k8s.io/kubernetes/pkg/client/unversioned"
+	"k8s.io/client-go/pkg/api/v1"
 )
 
 type ListCommand struct {
@@ -23,7 +22,6 @@ func (c *ListCommand) Run(args []string) int {
 		arguments    []string
 		base64encode bool
 		kubeconfig   string
-		kubeClient   *client.Client
 		namespace    string
 		v            string
 	)
@@ -33,7 +31,7 @@ func (c *ListCommand) Run(args []string) int {
 
 	flags.BoolVar(&base64encode, "base64", false, "If true, values are shown as base64-encoded string (Default: false)")
 	flags.StringVar(&kubeconfig, "kubeconfig", "", "Path to the kubeconfig file (Default: ~/.kube/config)")
-	flags.StringVar(&namespace, "namespace", "", "Namespace scope (Default: default)")
+	flags.StringVar(&namespace, "namespace", v1.NamespaceDefault, "Namespace scope")
 
 	if err := flags.Parse(args[0:]); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -50,12 +48,7 @@ func (c *ListCommand) Run(args []string) int {
 		return 1
 	}
 
-	if namespace == "" {
-		namespace = api.NamespaceDefault
-	}
-
-	kubeClient, err := k8s.NewKubeClient(kubeconfig)
-
+	clientset, err := k8s.NewKubeClient(kubeconfig)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
@@ -66,8 +59,7 @@ func (c *ListCommand) Run(args []string) int {
 	fmt.Fprintln(w, strings.Join([]string{"NAME", "TYPE", "KEY", "VALUE"}, "\t"))
 
 	if len(arguments) == 1 {
-		secret, err := kubeClient.Secrets(namespace).Get(arguments[0])
-
+		secret, err := clientset.Core().Secrets(namespace).Get(arguments[0])
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return 1
@@ -83,8 +75,7 @@ func (c *ListCommand) Run(args []string) int {
 			fmt.Fprintln(w, strings.Join([]string{secret.Name, string(secret.Type), key, v}, "\t"))
 		}
 	} else {
-		secrets, err := kubeClient.Secrets(namespace).List(api.ListOptions{})
-
+		secrets, err := clientset.Core().Secrets(namespace).List(v1.ListOptions{})
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return 1

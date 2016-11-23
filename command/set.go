@@ -8,8 +8,7 @@ import (
 	"strings"
 
 	"github.com/dtan4/k8sec/k8s"
-	"k8s.io/kubernetes/pkg/api"
-	client "k8s.io/kubernetes/pkg/client/unversioned"
+	"k8s.io/client-go/pkg/api/v1"
 )
 
 type SetCommand struct {
@@ -21,7 +20,6 @@ func (c *SetCommand) Run(args []string) int {
 		arguments     []string
 		base64encoded bool
 		kubeconfig    string
-		kubeClient    *client.Client
 		namespace     string
 	)
 
@@ -30,7 +28,7 @@ func (c *SetCommand) Run(args []string) int {
 
 	flags.BoolVar(&base64encoded, "base64", false, "If true, values are parsed as base64-encoded string (Default: false)")
 	flags.StringVar(&kubeconfig, "kubeconfig", "", "Path to the kubeconfig file (Default: ~/.kube/config)")
-	flags.StringVar(&namespace, "namespace", "", "Namespace scope (Default: default)")
+	flags.StringVar(&namespace, "namespace", v1.NamespaceDefault, "Namespace scope")
 
 	if err := flags.Parse(args[0:]); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -40,10 +38,6 @@ func (c *SetCommand) Run(args []string) int {
 	for 0 < flags.NArg() {
 		arguments = append(arguments, flags.Arg(0))
 		flags.Parse(flags.Args()[1:])
-	}
-
-	if namespace == "" {
-		namespace = api.NamespaceDefault
 	}
 
 	if len(arguments) < 2 {
@@ -67,7 +61,6 @@ func (c *SetCommand) Run(args []string) int {
 
 		if base64encoded {
 			_v, err := base64.StdEncoding.DecodeString(v)
-
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				return 1
@@ -79,15 +72,13 @@ func (c *SetCommand) Run(args []string) int {
 		}
 	}
 
-	kubeClient, err := k8s.NewKubeClient(kubeconfig)
-
+	clientset, err := k8s.NewKubeClient(kubeconfig)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
 	}
 
-	s, err := kubeClient.Secrets(namespace).Get(name)
-
+	s, err := clientset.Core().Secrets(namespace).Get(name)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
@@ -97,8 +88,7 @@ func (c *SetCommand) Run(args []string) int {
 		s.Data[k] = v
 	}
 
-	_, err = kubeClient.Secrets(namespace).Update(s)
-
+	_, err = clientset.Core().Secrets(namespace).Update(s)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
