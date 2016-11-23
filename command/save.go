@@ -9,8 +9,7 @@ import (
 	"strings"
 
 	"github.com/dtan4/k8sec/k8s"
-	"k8s.io/kubernetes/pkg/api"
-	client "k8s.io/kubernetes/pkg/client/unversioned"
+	"k8s.io/client-go/pkg/api/v1"
 )
 
 type SaveCommand struct {
@@ -22,7 +21,6 @@ func (c *SaveCommand) Run(args []string) int {
 		arguments  []string
 		filename   string
 		kubeconfig string
-		kubeClient *client.Client
 		namespace  string
 	)
 
@@ -31,7 +29,7 @@ func (c *SaveCommand) Run(args []string) int {
 
 	flags.StringVar(&filename, "f", "", "Path to save (Default: flush to stdout)")
 	flags.StringVar(&kubeconfig, "kubeconfig", "", "Path to the kubeconfig file (Default: ~/.kube/config)")
-	flags.StringVar(&namespace, "namespace", "", "Namespace scope (Default: default)")
+	flags.StringVar(&namespace, "namespace", v1.NamespaceDefault, "Namespace scope")
 
 	if err := flags.Parse(args[0:]); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -48,12 +46,7 @@ func (c *SaveCommand) Run(args []string) int {
 		return 1
 	}
 
-	if namespace == "" {
-		namespace = api.NamespaceDefault
-	}
-
-	kubeClient, err := k8s.NewKubeClient(kubeconfig)
-
+	clientset, err := k8s.NewKubeClient(kubeconfig)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
@@ -62,8 +55,7 @@ func (c *SaveCommand) Run(args []string) int {
 	var lines []string
 
 	if len(arguments) == 1 {
-		secret, err := kubeClient.Secrets(namespace).Get(arguments[0])
-
+		secret, err := clientset.Core().Secrets(namespace).Get(arguments[0])
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return 1
@@ -73,8 +65,7 @@ func (c *SaveCommand) Run(args []string) int {
 			lines = append(lines, key+"="+strconv.Quote(string(value)))
 		}
 	} else {
-		secrets, err := kubeClient.Secrets(namespace).List(api.ListOptions{})
-
+		secrets, err := clientset.Core().Secrets(namespace).List(v1.ListOptions{})
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return 1
@@ -89,19 +80,16 @@ func (c *SaveCommand) Run(args []string) int {
 
 	if filename != "" {
 		f, err := os.Create(filename)
-
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return 1
 		}
-
 		defer f.Close()
 
 		w := bufio.NewWriter(f)
 
 		for _, line := range lines {
 			_, err := w.WriteString(line + "\n")
-
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				return 1

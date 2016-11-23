@@ -1,32 +1,25 @@
 package k8s
 
 import (
-	client "k8s.io/kubernetes/pkg/client/unversioned"
-	"k8s.io/kubernetes/pkg/client/unversioned/clientcmd"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
-func NewKubeClient(kubeconfig string) (*client.Client, error) {
-	loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
-
+// NewKubeClient creates new Kubernetes API client
+func NewKubeClient(kubeconfig string) (*kubernetes.Clientset, error) {
 	if kubeconfig == "" {
-		loadingRules.ExplicitPath = clientcmd.RecommendedHomeFile
-	} else {
-		loadingRules.ExplicitPath = kubeconfig
+		kubeconfig = clientcmd.RecommendedHomeFile
 	}
 
-	loader := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, &clientcmd.ConfigOverrides{})
-
-	clientConfig, err := loader.ClientConfig()
-
+	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		return nil, err
 	}
 
-	kubeClient, err := client.New(clientConfig)
-
+	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return nil, err
 	}
 
-	return kubeClient, nil
+	return clientset, nil
 }
