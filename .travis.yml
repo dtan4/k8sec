@@ -12,6 +12,7 @@ install:
 script:
   - make test
 before_deploy:
+  - GOOS=linux GOARCH=amd64 make
   - make cross-build
   - make dist
 deploy:
