@@ -31,7 +31,7 @@ deploy:
     skip_cleanup: true
     script: make ci-docker-release
     on:
-      all_branches: true
+      branch: master
       go: '1.7'
   - provider: script
     skip_cleanup: true
