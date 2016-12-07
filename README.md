@@ -5,6 +5,10 @@
 
 CLI tool to manage [Kubernetes Secrets](http://kubernetes.io/docs/user-guide/secrets/) easily
 
+## Requirements
+
+Kubernetes 1.3 or above
+
 ## Installation
 
 ### Using Homebrew (OS X only)
