@@ -7,10 +7,20 @@ LDFLAGS := -ldflags="-s -w -X \"main.Version=$(VERSION)\" -X \"main.Revision=$(R
 
 DIST_DIRS := find * -type d -exec
 
+DOCKER_REPOSITORY := quay.io
+DOCKER_IMAGE_NAME := $(DOCKER_REPOSITORY)/dtan4/k8sec
+DOCKER_IMAGE_TAG  ?= latest
+DOCKER_IMAGE      := $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)
+
 .DEFAULT_GOAL := bin/$(NAME)
 
 bin/$(NAME): $(SRCS)
 	go build $(LDFLAGS) -o bin/$(NAME)
+
+.PHONY: ci-docker-release
+ci-docker-release: docker-build
+	@docker login -e="$(DOCKER_QUAY_EMAIL)" -u="$(DOCKER_QUAY_USERNAME)" -p="$(DOCKER_QUAY_PASSWORD)" $(DOCKER_REPOSITORY)
+	docker push $(DOCKER_IMAGE)
 
 .PHONY: clean
 clean:
@@ -38,6 +48,14 @@ dist:
 	$(DIST_DIRS) tar -zcf $(NAME)-$(VERSION)-{}.tar.gz {} \; && \
 	$(DIST_DIRS) zip -r $(NAME)-$(VERSION)-{}.zip {} \; && \
 	cd ..
+
+.PHONY: docker-build
+docker-build:
+ifeq ($(findstring ELF 64-bit LSB,$(shell file bin/$(NAME) 2> /dev/null)),)
+	@echo "bin/$(NAME) is not a Linux 64bit binary."
+	@exit 1
+endif
+	docker build -t $(DOCKER_IMAGE) .
 
 .PHONY: glide
 glide:
