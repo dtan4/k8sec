@@ -3,7 +3,7 @@ VERSION := v0.2.0
 REVISION := $(shell git rev-parse --short HEAD)
 
 SRCS    := $(shell find . -type f -name '*.go')
-LDFLAGS := -ldflags="-s -w -X \"main.Version=$(VERSION)\" -X \"main.Revision=$(REVISION)\" -extldflags \"-static\""
+LDFLAGS := -ldflags="-s -w -X \"main.Version=$(VERSION)\" -X \"main.Revision=$(REVISION)\" -linkmode external -extldflags -static"
 
 DIST_DIRS := find * -type d -exec
 
@@ -56,6 +56,12 @@ ifeq ($(findstring ELF 64-bit LSB,$(shell file bin/$(NAME) 2> /dev/null)),)
 	@exit 1
 endif
 	docker build -t $(DOCKER_IMAGE) .
+
+.PHONY: docker-test
+docker-test:
+	GOOS=linux GOARCH=amd64 $(MAKE)
+	$(MAKE) docker-build
+	docker run --rm $(DOCKER_IMAGE) version
 
 .PHONY: glide
 glide:

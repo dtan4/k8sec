@@ -14,6 +14,7 @@ install:
   - make deps
 script:
   - make test
+  - make docker-test
 before_deploy:
   - GOOS=linux GOARCH=amd64 make
   - make cross-build
