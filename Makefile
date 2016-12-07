@@ -3,7 +3,7 @@ VERSION := v0.1.1
 REVISION := $(shell git rev-parse --short HEAD)
 
 SRCS    := $(shell find . -type f -name '*.go')
-LDFLAGS := -ldflags="-s -w -X \"main.Version=$(VERSION)\" -X \"main.Revision=$(REVISION)\""
+LDFLAGS := -ldflags="-s -w -X \"main.Version=$(VERSION)\" -X \"main.Revision=$(REVISION)\" -extldflags \"-static\""
 
 DIST_DIRS := find * -type d -exec
 
@@ -15,7 +15,7 @@ DOCKER_IMAGE      := $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)
 .DEFAULT_GOAL := bin/$(NAME)
 
 bin/$(NAME): $(SRCS)
-	go build $(LDFLAGS) -o bin/$(NAME)
+	go build -a -tags netgo -installsuffix netgo $(LDFLAGS) -o bin/$(NAME)
 
 .PHONY: ci-docker-release
 ci-docker-release: docker-build
@@ -29,10 +29,10 @@ clean:
 	rm -rf vendor/*
 
 .PHONY: cross-build
-cross-build: deps
+cross-build:
 	for os in darwin linux windows; do \
 		for arch in amd64 386; do \
-			GOOS=$$os GOARCH=$$arch go build $(LDFLAGS) -o dist/$$os-$$arch/$(NAME); \
+			GOOS=$$os GOARCH=$$arch go build -a -tags netgo -installsuffix netgo $(LDFLAGS) -o dist/$$os-$$arch/$(NAME); \
 		done; \
 	done
 
