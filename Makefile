@@ -3,7 +3,7 @@ VERSION := v0.2.0
 REVISION := $(shell git rev-parse --short HEAD)
 
 SRCS    := $(shell find . -type f -name '*.go')
-LDFLAGS := -ldflags="-s -w -X \"main.Version=$(VERSION)\" -X \"main.Revision=$(REVISION)\" -linkmode external -extldflags -static"
+LDFLAGS := -ldflags="-s -w -X \"main.Version=$(VERSION)\" -X \"main.Revision=$(REVISION)\" -extldflags -static"
 
 DIST_DIRS := find * -type d -exec
 
@@ -32,7 +32,7 @@ clean:
 cross-build:
 	for os in darwin linux windows; do \
 		for arch in amd64 386; do \
-			GOOS=$$os GOARCH=$$arch go build -a -tags netgo -installsuffix netgo $(LDFLAGS) -o dist/$$os-$$arch/$(NAME); \
+			GOOS=$$os GOARCH=$$arch CGO_ENABLED=0 go build -a -tags netgo -installsuffix netgo $(LDFLAGS) -o dist/$$os-$$arch/$(NAME); \
 		done; \
 	done
 
@@ -59,7 +59,7 @@ endif
 
 .PHONY: docker-test
 docker-test:
-	GOOS=linux GOARCH=amd64 $(MAKE)
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 $(MAKE)
 	$(MAKE) docker-build
 	docker run --rm $(DOCKER_IMAGE) version
 
