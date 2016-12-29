@@ -6,3 +6,4 @@ import:
   - pkg/api/v1
   - kubernetes
   - tools/clientcmd
+- package: github.com/spf13/cobra
