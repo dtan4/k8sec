@@ -102,19 +102,19 @@ $ k8sec load -f .env rails
 $ cat .env | k8sec load rails
 ```
 
-### `k8sec save`
+### `k8sec dump`
 
 Save as dotenv (key=value) format
 
 ``` bash
-$ k8sec save [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [-f FILENAME] [NAME]
+$ k8sec dump [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [-f FILENAME] [NAME]
 
 # Example
-$ k8sec save rails
+$ k8sec dump rails
 database-url="postgres://example.com:5432/dbname"
 
 # Save as .env
-$ k8sec save -f .env rails
+$ k8sec dump -f .env rails
 $ cat .env
 database-url="postgres://example.com:5432/dbname"
 ```
