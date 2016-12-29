@@ -7,18 +7,8 @@ import (
 
 func Commands(meta *command.Meta) map[string]cli.CommandFactory {
 	return map[string]cli.CommandFactory{
-		"set": func() (cli.Command, error) {
-			return &command.SetCommand{
-				Meta: *meta,
-			}, nil
-		},
 		"unset": func() (cli.Command, error) {
 			return &command.UnsetCommand{
-				Meta: *meta,
-			}, nil
-		},
-		"list": func() (cli.Command, error) {
-			return &command.ListCommand{
 				Meta: *meta,
 			}, nil
 		},
