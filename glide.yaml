@@ -7,3 +7,5 @@ import:
   - kubernetes
   - tools/clientcmd
 - package: github.com/spf13/cobra
+- package: github.com/pkg/errors
+  version: ~0.8.0
