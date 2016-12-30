@@ -16,14 +16,29 @@ var setOpts = struct {
 
 // setCmd represents the set command
 var setCmd = &cobra.Command{
-	Use:   "set",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Use:   "set NAME KEY1=VALUE1 [KEY2=VALUE2 ...]",
+	Short: "Set secrets",
+	Long: `Set secrets
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+Set value as it is:
+
+$ k8sec set rails rails-env=production
+rails
+
+Set base64-encoded value:
+
+$ echo -n dtan4 | base64
+ZHRhbjQ=
+$ k8sec set --base64 rails foo=ZHRhbjQ=
+rails
+
+Result:
+
+$ k8sec list rails
+NAME    TYPE    KEY             VALUE
+rails   Opaque  database-url    "postgres://example.com:5432/dbname"
+rails   Opaque  foo             "dtan4"
+`,
 	RunE: doSet,
 }
 

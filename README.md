@@ -58,21 +58,22 @@ rails   Opaque  database-url    cG9zdGdyZXM6Ly9leGFtcGxlLmNvbTo1NDMyL2RibmFtZQ==
 Set secrets
 
 ``` bash
-$ k8sec set [--base64] [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] NAME KEY1=VALUE1 KEY2=VALUE2
+$ k8sec set [--base64] [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] NAME KEY1=VALUE1 [KEY2=VALUE2 ...]
 
-# Example
 $ k8sec set rails rails-env=production
 rails
 
-# Pass base64-encoded value
-$ echo dtan4 | base64
-ZHRhbjQK
-$ k8sec set --base64 rails foo=ZHRhbjQK
+# Set base64-encoded value:
+$ echo -n dtan4 | base64
+ZHRhbjQ=
+$ k8sec set --base64 rails foo=ZHRhbjQ=
 rails
+
+# Result
 $ k8sec list rails
 NAME    TYPE    KEY             VALUE
 rails   Opaque  database-url    "postgres://example.com:5432/dbname"
-rails   Opaque  foo             "dtan4\n"
+rails   Opaque  foo             "dtan4"
 ```
 
 ### `k8sec unset`
@@ -88,7 +89,7 @@ $ k8sec unset rails rails-env
 
 ### `k8sec load`
 
-Load from dotenv (key=value) format text
+Load secrets from dotenv (key=value) format text
 
 ``` bash
 $ k8sec load [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [-f FILENAME] NAME
@@ -104,7 +105,7 @@ $ cat .env | k8sec load rails
 
 ### `k8sec dump`
 
-Save as dotenv (key=value) format
+Dump secrets as dotenv (key=value) format
 
 ``` bash
 $ k8sec dump [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [-f FILENAME] [NAME]

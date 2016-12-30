@@ -18,14 +18,19 @@ var dumpOpts = struct {
 
 // dumpCmd represents the dump command
 var dumpCmd = &cobra.Command{
-	Use:   "dump",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Use:   "dump [NAME]",
+	Short: "Dump secrets as dotenv (key=value) format",
+	Long: `Dump secrets as dotenv (key=value) format
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+$ k8sec dump rails
+database-url="postgres://example.com:5432/dbname"
+
+Save as .env:
+
+$ k8sec dump -f .env rails
+$ cat .env
+database-url="postgres://example.com:5432/dbname"
+`,
 	RunE: doDump,
 }
 

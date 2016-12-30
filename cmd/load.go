@@ -17,14 +17,18 @@ var loadOpts = struct {
 
 // loadCmd represents the load command
 var loadCmd = &cobra.Command{
-	Use:   "load",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Use:   "load NAME",
+	Short: "Load secrets from dotenv (key=value) format text",
+	Long: `Load secrets from dotenv (key=value) format text
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+$ cat .env
+database-url="postgres://example.com:5432/dbname"
+$ k8sec load -f .env rails
+
+Load from stdin:
+
+$ cat .env | k8sec load rails
+`,
 	RunE: doLoad,
 }
 
