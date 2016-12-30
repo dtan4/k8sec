@@ -1,3 +1,10 @@
+# [v0.3.0](https://github.com/dtan4/k8sec/releases/tag/v0.3.0) (2016-12-30)
+
+## Backward imcompatible changes
+
+- Rename `k8sec save` command as `k8sec dump` [#9](https://github.com/dtan4/k8sec/pull/9)
+  - No behavior changes.
+
 # [v0.2.0](https://github.com/dtan4/k8sec/releases/tag/v0.2.0) (2016-12-07)
 
 Drop Kubernetes <= 1.2 support
