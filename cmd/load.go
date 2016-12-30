@@ -1,0 +1,101 @@
+package cmd
+
+import (
+	"bufio"
+	"os"
+	"strconv"
+	"strings"
+
+	"github.com/dtan4/k8sec/k8s"
+	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
+)
+
+var loadOpts = struct {
+	filename string
+}{}
+
+// loadCmd represents the load command
+var loadCmd = &cobra.Command{
+	Use:   "load NAME",
+	Short: "Load secrets from dotenv (key=value) format text",
+	Long: `Load secrets from dotenv (key=value) format text
+
+$ cat .env
+database-url="postgres://example.com:5432/dbname"
+$ k8sec load -f .env rails
+
+Load from stdin:
+
+$ cat .env | k8sec load rails
+`,
+	RunE: doLoad,
+}
+
+func doLoad(cmd *cobra.Command, args []string) error {
+	if len(args) != 1 {
+		return errors.New("Variable name must be specified.")
+	}
+	name := args[0]
+
+	var sc *bufio.Scanner
+	data := map[string][]byte{}
+
+	if loadOpts.filename != "" {
+		f, err := os.Open(loadOpts.filename)
+		if err != nil {
+			return errors.Wrapf(err, "Failed to open file. filename=%s", loadOpts.filename)
+		}
+		defer f.Close()
+
+		sc = bufio.NewScanner(f)
+	} else {
+		sc = bufio.NewScanner(os.Stdin)
+	}
+
+	for sc.Scan() {
+		line := sc.Text()
+		ary := strings.SplitN(line, "=", 2)
+
+		if len(ary) != 2 {
+			return errors.Errorf("Line should be key=value format. line=%q", line)
+		}
+
+		k, v := ary[0], ary[1]
+
+		_v, err := strconv.Unquote(v)
+		if err != nil {
+			// Parse as is
+			_v = v
+		}
+
+		data[k] = []byte(_v)
+	}
+
+	clientset, err := k8s.NewKubeClient(rootOpts.kubeconfig)
+	if err != nil {
+		return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
+	}
+
+	s, err := clientset.Core().Secrets(rootOpts.namespace).Get(name)
+	if err != nil {
+		return errors.Wrapf(err, "Failed to get secret. name=%s", name)
+	}
+
+	for k, v := range data {
+		s.Data[k] = v
+	}
+
+	_, err = clientset.Core().Secrets(rootOpts.namespace).Update(s)
+	if err != nil {
+		return errors.Wrapf(err, "Failed to set secret. name=%s", name)
+	}
+
+	return nil
+}
+
+func init() {
+	RootCmd.AddCommand(loadCmd)
+
+	loadCmd.Flags().StringVarP(&loadOpts.filename, "filename", "f", "", "File to load")
+}

@@ -1,7 +1,7 @@
 package main
 
-import "os"
+import "github.com/dtan4/k8sec/cmd"
 
 func main() {
-	os.Exit(Run(os.Args[1:]))
+	cmd.Execute()
 }
