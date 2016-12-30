@@ -39,7 +39,7 @@ $ make install
 
 List secrets
 
-``` bash
+```bash
 $ k8sec list [--base64] [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [NAME]
 
 # Example
@@ -57,13 +57,13 @@ rails   Opaque  database-url    cG9zdGdyZXM6Ly9leGFtcGxlLmNvbTo1NDMyL2RibmFtZQ==
 
 Set secrets
 
-``` bash
+```bash
 $ k8sec set [--base64] [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] NAME KEY1=VALUE1 [KEY2=VALUE2 ...]
 
 $ k8sec set rails rails-env=production
 rails
 
-# Set base64-encoded value:
+# Set base64-encoded value
 $ echo -n dtan4 | base64
 ZHRhbjQ=
 $ k8sec set --base64 rails foo=ZHRhbjQ=
@@ -80,7 +80,7 @@ rails   Opaque  foo             "dtan4"
 
 Unset secrets
 
-``` bash
+```bash
 $ k8sec unset [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] NAME KEY1 KEY2
 
 # Example
@@ -91,7 +91,7 @@ $ k8sec unset rails rails-env
 
 Load secrets from dotenv (key=value) format text
 
-``` bash
+```bash
 $ k8sec load [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [-f FILENAME] NAME
 
 # Example
@@ -107,7 +107,7 @@ $ cat .env | k8sec load rails
 
 Dump secrets as dotenv (key=value) format
 
-``` bash
+```bash
 $ k8sec dump [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [-f FILENAME] [NAME]
 
 # Example
