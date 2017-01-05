@@ -63,6 +63,10 @@ docker-test:
 	$(MAKE) docker-build
 	docker run --rm $(DOCKER_IMAGE) version
 
+.PHONY: fast
+fast:
+	go build $(LDFLAGS) -o bin/$(NAME)
+
 .PHONY: glide
 glide:
 ifeq ($(shell command -v glide 2> /dev/null),)
