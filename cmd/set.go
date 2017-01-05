@@ -81,8 +81,12 @@ func doSet(cmd *cobra.Command, args []string) error {
 		return errors.Wrapf(err, "Failed to get current secret. name=%s", name)
 	}
 
-	for k, v := range data {
-		s.Data[k] = v
+	if s.Data == nil {
+		s.Data = data
+	} else {
+		for k, v := range data {
+			s.Data[k] = v
+		}
 	}
 
 	_, err = clientset.Core().Secrets(rootOpts.namespace).Update(s)
