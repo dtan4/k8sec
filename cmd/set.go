@@ -8,6 +8,7 @@ import (
 	"github.com/dtan4/k8sec/k8s"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"k8s.io/client-go/pkg/api/v1"
 )
 
 var setOpts = struct {
@@ -76,22 +77,50 @@ func doSet(cmd *cobra.Command, args []string) error {
 		return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
 	}
 
-	s, err := clientset.Core().Secrets(rootOpts.namespace).Get(name)
+	ss, err := clientset.Core().Secrets(rootOpts.namespace).List(v1.ListOptions{})
 	if err != nil {
 		return errors.Wrapf(err, "Failed to get current secret. name=%s", name)
 	}
 
-	if s.Data == nil {
-		s.Data = data
-	} else {
-		for k, v := range data {
-			s.Data[k] = v
+	exists := false
+
+	for _, s := range ss.Items {
+		if s.Name == name {
+			exists = true
+			break
 		}
 	}
 
-	_, err = clientset.Core().Secrets(rootOpts.namespace).Update(s)
-	if err != nil {
-		return errors.Wrapf(err, "Failed to set secret. name=%s", name)
+	var s *v1.Secret
+
+	if exists {
+		s, err = clientset.Core().Secrets(rootOpts.namespace).Get(name)
+		if err != nil {
+			return errors.Wrapf(err, "Failed to get current secret. name=%s", name)
+		}
+
+		if s.Data == nil {
+			s.Data = data
+		} else {
+			for k, v := range data {
+				s.Data[k] = v
+			}
+		}
+
+		_, err = clientset.Core().Secrets(rootOpts.namespace).Update(s)
+		if err != nil {
+			return errors.Wrapf(err, "Failed to update secret. name=%s", name)
+		}
+	} else {
+		s = &v1.Secret{
+			Data: data,
+		}
+		s.SetName(name)
+
+		_, err = clientset.Core().Secrets(rootOpts.namespace).Create(s)
+		if err != nil {
+			return errors.Wrapf(err, "Failed to create secret. name=%s", name)
+		}
 	}
 
 	fmt.Println(s.Name)
