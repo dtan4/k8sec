@@ -16,7 +16,6 @@ script:
   - make test
   - make docker-test
 before_deploy:
-  - GOOS=linux GOARCH=amd64 CGO_ENABLED=0 make
   - make cross-build
   - make dist
 deploy:
@@ -25,18 +24,6 @@ deploy:
     api_key: $GITHUB_TOKEN
     file_glob: true
     file: 'dist/*.{tar.gz,zip}'
-    on:
-      tags: true
-      go: '1.7'
-  - provider: script
-    skip_cleanup: true
-    script: make ci-docker-release
-    on:
-      branch: master
-      go: '1.7'
-  - provider: script
-    skip_cleanup: true
-    script: DOCKER_IMAGE_TAG=$TRAVIS_TAG make ci-docker-release
     on:
       tags: true
       go: '1.7'
