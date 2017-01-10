@@ -54,7 +54,7 @@ func doSet(cmd *cobra.Command, args []string) error {
 	for _, kv := range args[1:] {
 		ary := strings.SplitN(kv, "=", 2)
 
-		if len(args) != 2 {
+		if len(ary) != 2 {
 			return errors.Errorf("Argument should be in key=value format. argument=%q", kv)
 		}
 
