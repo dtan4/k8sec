@@ -1,3 +1,12 @@
+# [v0.3.1](https://github.com/dtan4/k8sec/releases/tag/v0.3.1) (2017-01-10)
+
+## Fixed
+
+- Update command description [#15](https://github.com/dtan4/k8sec/pull/15)
+- Suppress usage and error printing at error [#13](https://github.com/dtan4/k8sec/pull/13)
+- Check the length of key-value array [#12](https://github.com/dtan4/k8sec/pull/12)
+- Create new secret if it does not exist [#11](https://github.com/dtan4/k8sec/pull/11)
+
 # [v0.3.0](https://github.com/dtan4/k8sec/releases/tag/v0.3.0) (2016-12-30)
 
 ## Backward imcompatible changes
