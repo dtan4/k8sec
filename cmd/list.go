@@ -21,13 +21,19 @@ var listOpts = struct {
 // listCmd represents the list command
 var listCmd = &cobra.Command{
 	Use:   "list",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "List secrets",
+	Long: `List secrets
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+$ k8sec list rails
+NAME    TYPE    KEY             VALUE
+rails   Opaque  database-url    "postgres://example.com:5432/dbname"
+
+Show values as base64-encoded string:
+
+$ k8sec list --base64 rails
+NAME    TYPE    KEY             VALUE
+rails   Opaque  database-url    cG9zdGdyZXM6Ly9leGFtcGxlLmNvbTo1NDMyL2RibmFtZQ==
+`,
 	RunE: doList,
 }
 
