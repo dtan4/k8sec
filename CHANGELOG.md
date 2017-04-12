@@ -1,3 +1,9 @@
+# [v0.4.0](https://github.com/dtan4/k8sec/releases/tag/v0.4.0) (2017-04-12)
+
+## Features
+
+- Select context / Use namespace set in kubecfg [#18](https://github.com/dtan4/k8sec/pull/18)
+
 # [v0.3.1](https://github.com/dtan4/k8sec/releases/tag/v0.3.1) (2017-01-10)
 
 ## Fixed
