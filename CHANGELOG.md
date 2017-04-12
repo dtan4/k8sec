@@ -1,3 +1,9 @@
+# [v0.4.1](https://github.com/dtan4/k8sec/releases/tag/v0.4.1) (2017-04-12)
+
+## Fixed
+
+- Use correct namespace [#20](https://github.com/dtan4/k8sec/pull/20)
+
 # [v0.4.0](https://github.com/dtan4/k8sec/releases/tag/v0.4.0) (2017-04-12)
 
 ## Features
