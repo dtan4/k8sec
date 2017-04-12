@@ -117,7 +117,7 @@ func doSet(cmd *cobra.Command, args []string) error {
 		}
 		s.SetName(name)
 
-		_, err = k8sclient.Clientset.Core().Secrets(k8sclient.Namespace).Create(s)
+		_, err = k8sclient.CreateSecret(s)
 		if err != nil {
 			return errors.Wrapf(err, "Failed to create secret. name=%s", name)
 		}
