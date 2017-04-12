@@ -39,12 +39,21 @@ Docker image is available at [`quay.io/wantedly/k8sec`](https://quay.io/reposito
 
 ## Usage
 
+### Global options
+
+|Option|Description|Required|Default|
+|---------|-----------|-------|-------|
+|`--context=CONTEXT`|Kubernetes context|||
+|`--kubeconfig=KUBECONFIG`|Path of kubeconfig||`~/.kube/config`|
+|`--namespace=NAMESPACE`|Kubernetes namespace||`default`|
+|`-h`, `-help`|Print command line usage|||
+
 ### `k8sec list`
 
 List secrets
 
 ```bash
-$ k8sec list [--base64] [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [NAME]
+$ k8sec list [--base64] [NAME]
 
 # Example
 $ k8sec list rails
@@ -62,7 +71,7 @@ rails   Opaque  database-url    cG9zdGdyZXM6Ly9leGFtcGxlLmNvbTo1NDMyL2RibmFtZQ==
 Set secrets
 
 ```bash
-$ k8sec set [--base64] [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] NAME KEY1=VALUE1 [KEY2=VALUE2 ...]
+$ k8sec set [--base64] NAME KEY1=VALUE1 [KEY2=VALUE2 ...]
 
 $ k8sec set rails rails-env=production
 rails
@@ -85,7 +94,7 @@ rails   Opaque  foo             "dtan4"
 Unset secrets
 
 ```bash
-$ k8sec unset [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] NAME KEY1 KEY2
+$ k8sec unset NAME KEY1 KEY2...
 
 # Example
 $ k8sec unset rails rails-env
@@ -96,7 +105,7 @@ $ k8sec unset rails rails-env
 Load secrets from dotenv (key=value) format text
 
 ```bash
-$ k8sec load [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [-f FILENAME] NAME
+$ k8sec load [-f FILENAME] NAME
 
 # Example
 $ cat .env
@@ -112,7 +121,7 @@ $ cat .env | k8sec load rails
 Dump secrets as dotenv (key=value) format
 
 ```bash
-$ k8sec dump [--kubeconfig KUBECONFIG] [--namespace NAMESPACE] [-f FILENAME] [NAME]
+$ k8sec dump [-f FILENAME] [NAME]
 
 # Example
 $ k8sec dump rails
