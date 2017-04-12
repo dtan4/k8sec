@@ -11,7 +11,6 @@ import (
 	"github.com/dtan4/k8sec/k8s"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"k8s.io/client-go/pkg/api/v1"
 )
 
 var listOpts = struct {
@@ -42,7 +41,7 @@ func doList(cmd *cobra.Command, args []string) error {
 		return errors.New("Too many arguments.")
 	}
 
-	clientset, err := k8s.NewKubeClient(rootOpts.kubeconfig)
+	k8sclient, err := k8s.NewKubeClient(rootOpts.kubeconfig, rootOpts.context, rootOpts.namespace)
 	if err != nil {
 		return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
 	}
@@ -54,7 +53,7 @@ func doList(cmd *cobra.Command, args []string) error {
 	var v string
 
 	if len(args) == 1 {
-		secret, err := clientset.Core().Secrets(rootOpts.namespace).Get(args[0])
+		secret, err := k8sclient.GetSecret(args[0])
 		if err != nil {
 			return errors.Wrap(err, "Failed to retrieve secrets.")
 		}
@@ -69,7 +68,7 @@ func doList(cmd *cobra.Command, args []string) error {
 			fmt.Fprintln(w, strings.Join([]string{secret.Name, string(secret.Type), key, v}, "\t"))
 		}
 	} else {
-		secrets, err := clientset.Core().Secrets(rootOpts.namespace).List(v1.ListOptions{})
+		secrets, err := k8sclient.ListSecrets()
 		if err != nil {
 			return errors.Wrap(err, "Failed to retrieve secrets.")
 		}

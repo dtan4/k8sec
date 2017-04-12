@@ -8,6 +8,7 @@ import (
 )
 
 var rootOpts = struct {
+	context    string
 	debug      bool
 	kubeconfig string
 	namespace  string
@@ -40,9 +41,10 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
+	RootCmd.PersistentFlags().StringVar(&rootOpts.context, "context", "", "Kubernetes context")
 	RootCmd.PersistentFlags().BoolVar(&rootOpts.debug, "debug", false, "Debug mode")
-	RootCmd.PersistentFlags().StringVar(&rootOpts.kubeconfig, "kubeconfig", "", "Path of kubeconfig file")
-	RootCmd.PersistentFlags().StringVar(&rootOpts.namespace, "namespace", "", "Namespace scope")
+	RootCmd.PersistentFlags().StringVar(&rootOpts.kubeconfig, "kubeconfig", "", "Path of kubeconfig")
+	RootCmd.PersistentFlags().StringVar(&rootOpts.namespace, "namespace", "", "Kubernetes namespace")
 }
 
 func initConfig() {

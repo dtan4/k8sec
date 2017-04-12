@@ -9,7 +9,6 @@ import (
 	"github.com/dtan4/k8sec/k8s"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"k8s.io/client-go/pkg/api/v1"
 )
 
 var dumpOpts = struct {
@@ -39,7 +38,7 @@ func doDump(cmd *cobra.Command, args []string) error {
 		return errors.New("Too many arguments.")
 	}
 
-	clientset, err := k8s.NewKubeClient(rootOpts.kubeconfig)
+	k8sclient, err := k8s.NewKubeClient(rootOpts.kubeconfig, rootOpts.context, rootOpts.namespace)
 	if err != nil {
 		return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
 	}
@@ -47,7 +46,7 @@ func doDump(cmd *cobra.Command, args []string) error {
 	var lines []string
 
 	if len(args) == 1 {
-		secret, err := clientset.Core().Secrets(rootOpts.namespace).Get(args[0])
+		secret, err := k8sclient.GetSecret(args[0])
 		if err != nil {
 			return errors.Wrapf(err, "Failed to get secret. name=%s", args[0])
 		}
@@ -56,7 +55,7 @@ func doDump(cmd *cobra.Command, args []string) error {
 			lines = append(lines, key+"="+strconv.Quote(string(value)))
 		}
 	} else {
-		secrets, err := clientset.Core().Secrets(rootOpts.namespace).List(v1.ListOptions{})
+		secrets, err := k8sclient.ListSecrets()
 		if err != nil {
 			return errors.Wrap(err, "Failed to list secret.")
 		}
