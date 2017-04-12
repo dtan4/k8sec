@@ -54,6 +54,11 @@ func NewKubeClient(kubeconfig, context, namespace string) (*KubeClient, error) {
 	}, nil
 }
 
+// GetSecret returns secret with the given name
+func (c *KubeClient) GetSecret(name string) (*v1.Secret, error) {
+	return c.Clientset.Core().Secrets(c.Namespace).Get(name)
+}
+
 // ListSecrets returns the list of Secrets
 func (c *KubeClient) ListSecrets() (*v1.SecretList, error) {
 	return c.Clientset.Core().Secrets(c.Namespace).List(v1.ListOptions{})

@@ -46,7 +46,7 @@ func doDump(cmd *cobra.Command, args []string) error {
 	var lines []string
 
 	if len(args) == 1 {
-		secret, err := k8sclient.Clientset.Core().Secrets(k8sclient.Namespace).Get(args[0])
+		secret, err := k8sclient.GetSecret(args[0])
 		if err != nil {
 			return errors.Wrapf(err, "Failed to get secret. name=%s", args[0])
 		}

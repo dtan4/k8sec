@@ -53,7 +53,7 @@ func doList(cmd *cobra.Command, args []string) error {
 	var v string
 
 	if len(args) == 1 {
-		secret, err := k8sclient.Clientset.Core().Secrets(k8sclient.Namespace).Get(args[0])
+		secret, err := k8sclient.GetSecret(args[0])
 		if err != nil {
 			return errors.Wrap(err, "Failed to retrieve secrets.")
 		}
