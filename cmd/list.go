@@ -11,7 +11,6 @@ import (
 	"github.com/dtan4/k8sec/k8s"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"k8s.io/client-go/pkg/api/v1"
 )
 
 var listOpts = struct {
@@ -69,7 +68,7 @@ func doList(cmd *cobra.Command, args []string) error {
 			fmt.Fprintln(w, strings.Join([]string{secret.Name, string(secret.Type), key, v}, "\t"))
 		}
 	} else {
-		secrets, err := k8sclient.Clientset.Core().Secrets(k8sclient.Namespace).List(v1.ListOptions{})
+		secrets, err := k8sclient.ListSecrets()
 		if err != nil {
 			return errors.Wrap(err, "Failed to retrieve secrets.")
 		}

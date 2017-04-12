@@ -77,7 +77,7 @@ func doSet(cmd *cobra.Command, args []string) error {
 		return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
 	}
 
-	ss, err := k8sclient.Clientset.Core().Secrets(k8sclient.Namespace).List(v1.ListOptions{})
+	ss, err := k8sclient.ListSecrets()
 	if err != nil {
 		return errors.Wrapf(err, "Failed to get current secret. name=%s", name)
 	}
