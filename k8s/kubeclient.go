@@ -2,16 +2,28 @@ package k8s
 
 import (
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+// KubeClient represents Kubernetes client and calculated namespace
+type KubeClient struct {
+	Clientset *kubernetes.Clientset
+	Namespace string
+}
+
 // NewKubeClient creates new Kubernetes API client
-func NewKubeClient(kubeconfig string) (*kubernetes.Clientset, error) {
+func NewKubeClient(kubeconfig, context, namespace string) (*KubeClient, error) {
 	if kubeconfig == "" {
 		kubeconfig = clientcmd.RecommendedHomeFile
 	}
 
-	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+	clientConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+		&clientcmd.ClientConfigLoadingRules{ExplicitPath: kubeconfig},
+		&clientcmd.ConfigOverrides{CurrentContext: context},
+	)
+
+	config, err := clientConfig.ClientConfig()
 	if err != nil {
 		return nil, err
 	}
@@ -21,5 +33,23 @@ func NewKubeClient(kubeconfig string) (*kubernetes.Clientset, error) {
 		return nil, err
 	}
 
-	return clientset, nil
+	rawConfig, err := clientConfig.RawConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	ns := namespace
+
+	if ns == "" {
+		if rawConfig.Contexts[rawConfig.CurrentContext].Namespace == "" {
+			ns = v1.NamespaceDefault
+		} else {
+			ns = rawConfig.Contexts[rawConfig.CurrentContext].Namespace
+		}
+	}
+
+	return &KubeClient{
+		Clientset: clientset,
+		Namespace: namespace,
+	}, nil
 }
