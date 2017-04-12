@@ -8,8 +8,8 @@ import (
 
 // KubeClient represents Kubernetes client and calculated namespace
 type KubeClient struct {
-	Clientset *kubernetes.Clientset
-	Namespace string
+	clientset *kubernetes.Clientset
+	namespace string
 }
 
 // NewKubeClient creates new Kubernetes API client
@@ -49,27 +49,27 @@ func NewKubeClient(kubeconfig, context, namespace string) (*KubeClient, error) {
 	}
 
 	return &KubeClient{
-		Clientset: clientset,
-		Namespace: namespace,
+		clientset: clientset,
+		namespace: namespace,
 	}, nil
 }
 
 // CreateSecret creates new Secret
 func (c *KubeClient) CreateSecret(secret *v1.Secret) (*v1.Secret, error) {
-	return c.Clientset.Core().Secrets(c.Namespace).Create(secret)
+	return c.clientset.Core().Secrets(c.namespace).Create(secret)
 }
 
 // GetSecret returns secret with the given name
 func (c *KubeClient) GetSecret(name string) (*v1.Secret, error) {
-	return c.Clientset.Core().Secrets(c.Namespace).Get(name)
+	return c.clientset.Core().Secrets(c.namespace).Get(name)
 }
 
 // ListSecrets returns the list of Secrets
 func (c *KubeClient) ListSecrets() (*v1.SecretList, error) {
-	return c.Clientset.Core().Secrets(c.Namespace).List(v1.ListOptions{})
+	return c.clientset.Core().Secrets(c.namespace).List(v1.ListOptions{})
 }
 
 // UpdateSecret updates the existed secret
 func (c *KubeClient) UpdateSecret(secret *v1.Secret) (*v1.Secret, error) {
-	return c.Clientset.Core().Secrets(c.Namespace).Update(secret)
+	return c.clientset.Core().Secrets(c.namespace).Update(secret)
 }
