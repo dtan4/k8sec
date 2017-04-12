@@ -50,7 +50,7 @@ func NewKubeClient(kubeconfig, context, namespace string) (*KubeClient, error) {
 
 	return &KubeClient{
 		clientset: clientset,
-		namespace: namespace,
+		namespace: ns,
 	}, nil
 }
 
