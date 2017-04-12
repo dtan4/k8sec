@@ -1,5 +1,5 @@
-hash: acf78a10d962af6eae72b2a4d5240e3373d51ddc415d2ef276c53d780c4b31fb
-updated: 2016-12-30T00:42:29.130304209+09:00
+hash: abaf2b9ba23a2845b0abd98e3b8dccb7536298d438c0c170af9d228bb1b96429
+updated: 2017-04-12T11:50:47.95656671+09:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -67,6 +67,8 @@ imports:
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/jonboulle/clockwork
   version: 72f9bd7c4e0c2a40055ab3d0f09654f730cce982
+- name: github.com/juju/ratelimit
+  version: 77ed1c8a01217656d2080ad51981f6e99adaa177
 - name: github.com/mailru/easyjson
   version: d5b7844b561a7bc640052f1b935f7b800330d7e0
   subpackages:
@@ -84,7 +86,7 @@ imports:
 - name: github.com/spf13/cobra
   version: de09d9ce07d0d8a74442cfeaa91628cf9492cc23
 - name: github.com/spf13/pflag
-  version: 25f8b5b07aece3207895bf19f7ab517eb3b22a40
+  version: c7e63cf4530bcd3ba943729cee0efeff2ebea63f
 - name: github.com/ugorji/go
   version: f1f1a805ed361a0e078bb537e4ea78cd37dcf065
   subpackages:
@@ -143,7 +145,7 @@ imports:
 - name: gopkg.in/yaml.v2
   version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
 - name: k8s.io/client-go
-  version: d81cb85237595f720d83eda492bae8f6162fc5c0
+  version: e121606b0d09b2e1c467183ee46217fa85a6b672
   subpackages:
   - discovery
   - kubernetes
@@ -234,7 +236,6 @@ imports:
   - pkg/util/net
   - pkg/util/parsers
   - pkg/util/rand
-  - pkg/util/ratelimit
   - pkg/util/runtime
   - pkg/util/sets
   - pkg/util/uuid
