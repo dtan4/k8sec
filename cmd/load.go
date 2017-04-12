@@ -86,7 +86,7 @@ func doLoad(cmd *cobra.Command, args []string) error {
 		s.Data[k] = v
 	}
 
-	_, err = k8sclient.Clientset.Core().Secrets(k8sclient.Namespace).Update(s)
+	_, err = k8sclient.UpdateSecret(s)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to set secret. name=%s", name)
 	}

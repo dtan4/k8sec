@@ -107,7 +107,7 @@ func doSet(cmd *cobra.Command, args []string) error {
 			}
 		}
 
-		_, err = k8sclient.Clientset.Core().Secrets(k8sclient.Namespace).Update(s)
+		_, err = k8sclient.UpdateSecret(s)
 		if err != nil {
 			return errors.Wrapf(err, "Failed to update secret. name=%s", name)
 		}

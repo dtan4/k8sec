@@ -63,3 +63,8 @@ func (c *KubeClient) GetSecret(name string) (*v1.Secret, error) {
 func (c *KubeClient) ListSecrets() (*v1.SecretList, error) {
 	return c.Clientset.Core().Secrets(c.Namespace).List(v1.ListOptions{})
 }
+
+// UpdateSecret updates the existed secret
+func (c *KubeClient) UpdateSecret(secret *v1.Secret) (*v1.Secret, error) {
+	return c.Clientset.Core().Secrets(c.Namespace).Update(secret)
+}

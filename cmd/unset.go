@@ -40,7 +40,7 @@ func doUnset(cmd *cobra.Command, args []string) error {
 		delete(s.Data, k)
 	}
 
-	_, err = k8sclient.Clientset.Core().Secrets(k8sclient.Namespace).Update(s)
+	_, err = k8sclient.UpdateSecret(s)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to unset secret. name=%s", name)
 	}
