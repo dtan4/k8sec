@@ -44,7 +44,7 @@ func init() {
 	RootCmd.PersistentFlags().StringVar(&rootOpts.context, "context", "", "Kubernetes context")
 	RootCmd.PersistentFlags().BoolVar(&rootOpts.debug, "debug", false, "Debug mode")
 	RootCmd.PersistentFlags().StringVar(&rootOpts.kubeconfig, "kubeconfig", "", "Path of kubeconfig")
-	RootCmd.PersistentFlags().StringVar(&rootOpts.namespace, "namespace", "", "Kubernetes namespace")
+	RootCmd.PersistentFlags().StringVarP(&rootOpts.namespace, "namespace", "n", "", "Kubernetes namespace")
 }
 
 func initConfig() {
