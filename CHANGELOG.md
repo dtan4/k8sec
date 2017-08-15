@@ -1,3 +1,13 @@
+# [v0.5.0](https://github.com/dtan4/k8sec/releases/tag/v0.5.0) (2017-08-15)
+
+## Features
+
+- Add `-n` flag as an alias of `--namespace` [#23](https://github.com/dtan4/k8sec/pull/23)
+
+## Fixed
+
+- Modify application name in version command [#22](https://github.com/dtan4/k8sec/pull/22)
+
 # [v0.4.1](https://github.com/dtan4/k8sec/releases/tag/v0.4.1) (2017-04-12)
 
 ## Fixed
