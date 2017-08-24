@@ -86,8 +86,14 @@ func doList(cmd *cobra.Command, args []string) error {
 			}
 		}
 
+		// sort by KEY
 		sort.Slice(sortedSecrets, func(i, j int) bool {
 			return sortedSecrets[i][2] < sortedSecrets[j][2]
+		})
+
+		// sort by NAME
+		sort.SliceStable(sortedSecrets, func(i, j int) bool {
+			return sortedSecrets[i][0] < sortedSecrets[j][0]
 		})
 
 		for _, secrets := range sortedSecrets {
