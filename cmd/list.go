@@ -69,6 +69,11 @@ func doList(cmd *cobra.Command, args []string) error {
 			}
 			formattedSecrets = append(formattedSecrets, []string{secret.Name, string(secret.Type), key, v})
 		}
+
+		// sort by KEY
+		sort.SliceStable(formattedSecrets, func(i, j int) bool {
+			return formattedSecrets[i][2] < formattedSecrets[j][2]
+		})
 	} else {
 		secrets, err := k8sclient.ListSecrets()
 		if err != nil {
@@ -86,16 +91,6 @@ func doList(cmd *cobra.Command, args []string) error {
 			}
 		}
 	}
-
-	// sort by KEY
-	sort.Slice(formattedSecrets, func(i, j int) bool {
-		return formattedSecrets[i][2] < formattedSecrets[j][2]
-	})
-
-	// sort by NAME
-	sort.SliceStable(formattedSecrets, func(i, j int) bool {
-		return formattedSecrets[i][0] < formattedSecrets[j][0]
-	})
 
 	for _, secret := range formattedSecrets {
 		fmt.Fprintln(w, strings.Join(secret, "\t"))
