@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -52,6 +53,8 @@ func doList(cmd *cobra.Command, args []string) error {
 
 	var v string
 
+	sortedSecrets := [][]string{}
+
 	if len(args) == 1 {
 		secret, err := k8sclient.GetSecret(args[0])
 		if err != nil {
@@ -65,7 +68,8 @@ func doList(cmd *cobra.Command, args []string) error {
 				v = strconv.Quote(string(value))
 			}
 
-			fmt.Fprintln(w, strings.Join([]string{secret.Name, string(secret.Type), key, v}, "\t"))
+			secrets := []string{secret.Name, string(secret.Type), key, v}
+			sortedSecrets = append(sortedSecrets, secrets)
 		}
 	} else {
 		secrets, err := k8sclient.ListSecrets()
@@ -81,9 +85,18 @@ func doList(cmd *cobra.Command, args []string) error {
 					v = strconv.Quote(string(value))
 				}
 
-				fmt.Fprintln(w, strings.Join([]string{secret.Name, string(secret.Type), key, v}, "\t"))
+				secrets := []string{secret.Name, string(secret.Type), key, v}
+				sortedSecrets = append(sortedSecrets, secrets)
 			}
 		}
+	}
+
+	sort.Slice(sortedSecrets, func(i, j int) bool {
+		return sortedSecrets[i][2] < sortedSecrets[j][2]
+	})
+
+	for _, secrets := range sortedSecrets {
+		fmt.Fprintln(w, strings.Join(secrets, "\t"))
 	}
 
 	w.Flush()
