@@ -53,8 +53,6 @@ func doList(cmd *cobra.Command, args []string) error {
 
 	var v string
 
-	sortedSecrets := [][]string{}
-
 	if len(args) == 1 {
 		secret, err := k8sclient.GetSecret(args[0])
 		if err != nil {
@@ -67,15 +65,15 @@ func doList(cmd *cobra.Command, args []string) error {
 			} else {
 				v = strconv.Quote(string(value))
 			}
-
-			secrets := []string{secret.Name, string(secret.Type), key, v}
-			sortedSecrets = append(sortedSecrets, secrets)
+			fmt.Fprintln(w, strings.Join([]string{secret.Name, string(secret.Type), key, v}, "\t"))
 		}
 	} else {
 		secrets, err := k8sclient.ListSecrets()
 		if err != nil {
 			return errors.Wrap(err, "Failed to retrieve secrets.")
 		}
+
+		sortedSecrets := [][]string{}
 
 		for _, secret := range secrets.Items {
 			for key, value := range secret.Data {
@@ -84,19 +82,17 @@ func doList(cmd *cobra.Command, args []string) error {
 				} else {
 					v = strconv.Quote(string(value))
 				}
-
-				secrets := []string{secret.Name, string(secret.Type), key, v}
-				sortedSecrets = append(sortedSecrets, secrets)
+				sortedSecrets = append(sortedSecrets, []string{secret.Name, string(secret.Type), key, v})
 			}
 		}
-	}
 
-	sort.Slice(sortedSecrets, func(i, j int) bool {
-		return sortedSecrets[i][2] < sortedSecrets[j][2]
-	})
+		sort.Slice(sortedSecrets, func(i, j int) bool {
+			return sortedSecrets[i][2] < sortedSecrets[j][2]
+		})
 
-	for _, secrets := range sortedSecrets {
-		fmt.Fprintln(w, strings.Join(secrets, "\t"))
+		for _, secrets := range sortedSecrets {
+			fmt.Fprintln(w, strings.Join(secrets, "\t"))
+		}
 	}
 
 	w.Flush()
