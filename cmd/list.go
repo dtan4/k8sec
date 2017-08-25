@@ -130,8 +130,7 @@ func doList(cmd *cobra.Command, args []string) error {
 	}
 
 	for _, secret := range secretList {
-		a := []string{secret.Name, secret.Type, secret.Key, secret.Value}
-		fmt.Fprintln(w, strings.Join(a, "\t"))
+		fmt.Fprintln(w, strings.Join([]string{secret.Name, secret.Type, secret.Key, secret.Value}, "\t"))
 	}
 
 	w.Flush()
