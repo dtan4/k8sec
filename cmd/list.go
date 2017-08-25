@@ -37,6 +37,13 @@ rails   Opaque  database-url    cG9zdGdyZXM6Ly9leGFtcGxlLmNvbTo1NDMyL2RibmFtZQ==
 	RunE: doList,
 }
 
+type Secret struct {
+	Name  string
+	Type  string
+	Key   string
+	Value string
+}
+
 func doList(cmd *cobra.Command, args []string) error {
 	if len(args) > 1 {
 		return errors.New("Too many arguments.")
@@ -53,7 +60,7 @@ func doList(cmd *cobra.Command, args []string) error {
 
 	var v string
 
-	formattedSecrets := [][]string{}
+	secretList := []Secret{}
 
 	if len(args) == 1 {
 		secret, err := k8sclient.GetSecret(args[0])
@@ -67,12 +74,18 @@ func doList(cmd *cobra.Command, args []string) error {
 			} else {
 				v = strconv.Quote(string(value))
 			}
-			formattedSecrets = append(formattedSecrets, []string{secret.Name, string(secret.Type), key, v})
+
+			secretList = append(secretList, Secret{
+				Name:  secret.Name,
+				Type:  string(secret.Type),
+				Key:   key,
+				Value: v,
+			})
 		}
 
 		// sort by KEY
-		sort.Slice(formattedSecrets, func(i, j int) bool {
-			return formattedSecrets[i][2] < formattedSecrets[j][2]
+		sort.Slice(secretList, func(i, j int) bool {
+			return secretList[i].Key < secretList[j].Key
 		})
 	} else {
 		secrets, err := k8sclient.ListSecrets()
@@ -81,29 +94,44 @@ func doList(cmd *cobra.Command, args []string) error {
 		}
 
 		for _, secret := range secrets.Items {
+			kvs := []struct {
+				k, v string
+			}{}
+
 			for key, value := range secret.Data {
 				if listOpts.base64encode {
 					v = base64.StdEncoding.EncodeToString(value)
 				} else {
 					v = strconv.Quote(string(value))
 				}
-				formattedSecrets = append(formattedSecrets, []string{secret.Name, string(secret.Type), key, v})
+
+				kvs = append(kvs, struct {
+					k, v string
+				}{
+					k: key,
+					v: v,
+				})
+			}
+
+			// sort by KEY
+			sort.Slice(kvs, func(i, j int) bool {
+				return kvs[i].k < kvs[j].k
+			})
+
+			for _, kv := range kvs {
+				secretList = append(secretList, Secret{
+					Name:  secret.Name,
+					Type:  string(secret.Type),
+					Key:   kv.k,
+					Value: kv.v,
+				})
 			}
 		}
-
-		// sort by KEY
-		sort.Slice(formattedSecrets, func(i, j int) bool {
-			return formattedSecrets[i][2] < formattedSecrets[j][2]
-		})
-
-		// sort by NAME
-		sort.SliceStable(formattedSecrets, func(i, j int) bool {
-			return formattedSecrets[i][0] < formattedSecrets[j][0]
-		})
 	}
 
-	for _, secret := range formattedSecrets {
-		fmt.Fprintln(w, strings.Join(secret, "\t"))
+	for _, secret := range secretList {
+		a := []string{secret.Name, secret.Type, secret.Key, secret.Value}
+		fmt.Fprintln(w, strings.Join(a, "\t"))
 	}
 
 	w.Flush()
