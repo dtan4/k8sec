@@ -1,3 +1,9 @@
+# [v0.5.1](https://github.com/dtan4/k8sec/releases/tag/v0.5.1) (2017-08-25)
+
+## Fixed
+
+- Sort `k8sec list` command output [#25](https://github.com/dtan4/k8sec/pull/25) (thanks @unblee)
+
 # [v0.5.0](https://github.com/dtan4/k8sec/releases/tag/v0.5.0) (2017-08-15)
 
 ## Features
