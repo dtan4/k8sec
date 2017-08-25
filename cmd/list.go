@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -36,6 +37,13 @@ rails   Opaque  database-url    cG9zdGdyZXM6Ly9leGFtcGxlLmNvbTo1NDMyL2RibmFtZQ==
 	RunE: doList,
 }
 
+type Secret struct {
+	Name  string
+	Type  string
+	Key   string
+	Value string
+}
+
 func doList(cmd *cobra.Command, args []string) error {
 	if len(args) > 1 {
 		return errors.New("Too many arguments.")
@@ -52,6 +60,8 @@ func doList(cmd *cobra.Command, args []string) error {
 
 	var v string
 
+	secrets := []Secret{}
+
 	if len(args) == 1 {
 		secret, err := k8sclient.GetSecret(args[0])
 		if err != nil {
@@ -65,15 +75,29 @@ func doList(cmd *cobra.Command, args []string) error {
 				v = strconv.Quote(string(value))
 			}
 
-			fmt.Fprintln(w, strings.Join([]string{secret.Name, string(secret.Type), key, v}, "\t"))
+			secrets = append(secrets, Secret{
+				Name:  secret.Name,
+				Type:  string(secret.Type),
+				Key:   key,
+				Value: v,
+			})
 		}
+
+		// sort by KEY
+		sort.Slice(secrets, func(i, j int) bool {
+			return secrets[i].Key < secrets[j].Key
+		})
 	} else {
-		secrets, err := k8sclient.ListSecrets()
+		ss, err := k8sclient.ListSecrets()
 		if err != nil {
 			return errors.Wrap(err, "Failed to retrieve secrets.")
 		}
 
-		for _, secret := range secrets.Items {
+		for _, secret := range ss.Items {
+			kvs := []struct {
+				k, v string
+			}{}
+
 			for key, value := range secret.Data {
 				if listOpts.base64encode {
 					v = base64.StdEncoding.EncodeToString(value)
@@ -81,9 +105,32 @@ func doList(cmd *cobra.Command, args []string) error {
 					v = strconv.Quote(string(value))
 				}
 
-				fmt.Fprintln(w, strings.Join([]string{secret.Name, string(secret.Type), key, v}, "\t"))
+				kvs = append(kvs, struct {
+					k, v string
+				}{
+					k: key,
+					v: v,
+				})
+			}
+
+			// sort by KEY
+			sort.Slice(kvs, func(i, j int) bool {
+				return kvs[i].k < kvs[j].k
+			})
+
+			for _, kv := range kvs {
+				secrets = append(secrets, Secret{
+					Name:  secret.Name,
+					Type:  string(secret.Type),
+					Key:   kv.k,
+					Value: kv.v,
+				})
 			}
 		}
+	}
+
+	for _, secret := range secrets {
+		fmt.Fprintln(w, strings.Join([]string{secret.Name, secret.Type, secret.Key, secret.Value}, "\t"))
 	}
 
 	w.Flush()
