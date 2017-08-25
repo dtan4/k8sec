@@ -25,4 +25,3 @@ deploy:
     file: 'dist/*.{tar.gz,zip}'
     on:
       tags: true
-      go: '1.7'
