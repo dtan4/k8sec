@@ -135,6 +135,8 @@ database-url="postgres://example.com:5432/dbname"
 
 ## Contribution
 
+Go 1.8 or above is required.
+
 1. Fork ([https://github.com/dtan4/k8sec/fork](https://github.com/dtan4/k8sec/fork))
 1. Create a feature branch
 1. Commit your changes
