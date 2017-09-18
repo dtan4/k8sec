@@ -45,7 +45,7 @@ Docker image is available at [`quay.io/wantedly/k8sec`](https://quay.io/reposito
 |---------|-----------|-------|-------|
 |`--context=CONTEXT`|Kubernetes context|||
 |`--kubeconfig=KUBECONFIG`|Path of kubeconfig||`~/.kube/config`|
-|`-n`, --namespace=NAMESPACE`|Kubernetes namespace||`default`|
+|`-n`, `--namespace=NAMESPACE`|Kubernetes namespace||`default`|
 |`-h`, `-help`|Print command line usage|||
 
 ### `k8sec list`
