@@ -72,12 +72,20 @@ func doLoad(cmd *cobra.Command, args []string) error {
 		data[k] = []byte(_v)
 	}
 
-	k8sclient, err := k8s.NewKubeClient(rootOpts.kubeconfig, rootOpts.context, rootOpts.namespace)
+	k8sclient, err := k8s.NewKubeClient(rootOpts.kubeconfig, rootOpts.context)
 	if err != nil {
 		return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
 	}
 
-	s, err := k8sclient.GetSecret(name)
+	var namespace string
+
+	if rootOpts.namespace != "" {
+		namespace = rootOpts.namespace
+	} else {
+		namespace = k8sclient.DefaultNamespace()
+	}
+
+	s, err := k8sclient.GetSecret(namespace, name)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to get secret. name=%s", name)
 	}
@@ -86,7 +94,7 @@ func doLoad(cmd *cobra.Command, args []string) error {
 		s.Data[k] = v
 	}
 
-	_, err = k8sclient.UpdateSecret(s)
+	_, err = k8sclient.UpdateSecret(namespace, s)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to set secret. name=%s", name)
 	}

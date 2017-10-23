@@ -72,12 +72,20 @@ func doSet(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	k8sclient, err := k8s.NewKubeClient(rootOpts.kubeconfig, rootOpts.context, rootOpts.namespace)
+	k8sclient, err := k8s.NewKubeClient(rootOpts.kubeconfig, rootOpts.context)
 	if err != nil {
 		return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
 	}
 
-	ss, err := k8sclient.ListSecrets()
+	var namespace string
+
+	if rootOpts.namespace != "" {
+		namespace = rootOpts.namespace
+	} else {
+		namespace = k8sclient.DefaultNamespace()
+	}
+
+	ss, err := k8sclient.ListSecrets(namespace)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to get current secret. name=%s", name)
 	}
@@ -94,7 +102,7 @@ func doSet(cmd *cobra.Command, args []string) error {
 	var s *v1.Secret
 
 	if exists {
-		s, err = k8sclient.GetSecret(name)
+		s, err = k8sclient.GetSecret(namespace, name)
 		if err != nil {
 			return errors.Wrapf(err, "Failed to get current secret. name=%s", name)
 		}
@@ -107,7 +115,7 @@ func doSet(cmd *cobra.Command, args []string) error {
 			}
 		}
 
-		_, err = k8sclient.UpdateSecret(s)
+		_, err = k8sclient.UpdateSecret(namespace, s)
 		if err != nil {
 			return errors.Wrapf(err, "Failed to update secret. name=%s", name)
 		}
@@ -117,7 +125,7 @@ func doSet(cmd *cobra.Command, args []string) error {
 		}
 		s.SetName(name)
 
-		_, err = k8sclient.CreateSecret(s)
+		_, err = k8sclient.CreateSecret(namespace, s)
 		if err != nil {
 			return errors.Wrapf(err, "Failed to create secret. name=%s", name)
 		}

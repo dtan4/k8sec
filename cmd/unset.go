@@ -21,12 +21,20 @@ func doUnset(cmd *cobra.Command, args []string) error {
 	}
 	name := args[0]
 
-	k8sclient, err := k8s.NewKubeClient(rootOpts.kubeconfig, rootOpts.context, rootOpts.namespace)
+	k8sclient, err := k8s.NewKubeClient(rootOpts.kubeconfig, rootOpts.context)
 	if err != nil {
 		return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
 	}
 
-	s, err := k8sclient.GetSecret(name)
+	var namespace string
+
+	if rootOpts.namespace != "" {
+		namespace = rootOpts.namespace
+	} else {
+		namespace = k8sclient.DefaultNamespace()
+	}
+
+	s, err := k8sclient.GetSecret(namespace, name)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to get current secret. name=%s", name)
 	}
@@ -40,7 +48,7 @@ func doUnset(cmd *cobra.Command, args []string) error {
 		delete(s.Data, k)
 	}
 
-	_, err = k8sclient.UpdateSecret(s)
+	_, err = k8sclient.UpdateSecret(namespace, s)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to unset secret. name=%s", name)
 	}
