@@ -1,6 +1,9 @@
 sudo: required
 services:
   - docker
+branches:
+  only:
+    - master
 language: go
 go:
   - '1.8'
