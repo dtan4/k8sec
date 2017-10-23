@@ -38,15 +38,23 @@ func doDump(cmd *cobra.Command, args []string) error {
 		return errors.New("Too many arguments.")
 	}
 
-	k8sclient, err := k8s.NewKubeClient(rootOpts.kubeconfig, rootOpts.context, rootOpts.namespace)
+	k8sclient, err := k8s.NewKubeClient(rootOpts.kubeconfig, rootOpts.context)
 	if err != nil {
 		return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
+	}
+
+	var namespace string
+
+	if rootOpts.namespace != "" {
+		namespace = rootOpts.namespace
+	} else {
+		namespace = k8sclient.DefaultNamespace()
 	}
 
 	var lines []string
 
 	if len(args) == 1 {
-		secret, err := k8sclient.GetSecret(args[0])
+		secret, err := k8sclient.GetSecret(namespace, args[0])
 		if err != nil {
 			return errors.Wrapf(err, "Failed to get secret. name=%s", args[0])
 		}
@@ -55,7 +63,7 @@ func doDump(cmd *cobra.Command, args []string) error {
 			lines = append(lines, key+"="+strconv.Quote(string(value)))
 		}
 	} else {
-		secrets, err := k8sclient.ListSecrets()
+		secrets, err := k8sclient.ListSecrets(namespace)
 		if err != nil {
 			return errors.Wrap(err, "Failed to list secret.")
 		}
