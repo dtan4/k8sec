@@ -35,7 +35,7 @@ $ make install
 
 ### Docker image
 
-Docker image is available at [`quay.io/wantedly/k8sec`](https://quay.io/repository/dtan4/k8sec). This image is maintained at https://github.com/dtan4/dockerfile-k8sec .
+Docker image is available at [`quay.io/dtan4/k8sec`](https://quay.io/repository/dtan4/k8sec). This image is maintained at https://github.com/dtan4/dockerfile-k8sec .
 
 ## Usage
 
