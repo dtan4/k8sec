@@ -1,8 +1,9 @@
 package k8s
 
 import (
+	"k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
 )
@@ -65,12 +66,12 @@ func (c *KubeClient) CreateSecret(namespace string, secret *v1.Secret) (*v1.Secr
 
 // GetSecret returns secret with the given name
 func (c *KubeClient) GetSecret(namespace, name string) (*v1.Secret, error) {
-	return c.clientset.Core().Secrets(namespace).Get(name)
+	return c.clientset.Core().Secrets(namespace).Get(name, metav1.GetOptions{})
 }
 
 // ListSecrets returns the list of Secrets
 func (c *KubeClient) ListSecrets(namespace string) (*v1.SecretList, error) {
-	return c.clientset.Core().Secrets(namespace).List(v1.ListOptions{})
+	return c.clientset.Core().Secrets(namespace).List(metav1.ListOptions{})
 }
 
 // UpdateSecret updates the existed secret
