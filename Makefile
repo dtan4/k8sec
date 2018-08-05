@@ -7,7 +7,8 @@ LDFLAGS := -ldflags="-s -w -X \"github.com/dtan4/k8sec/version.Version=$(VERSION
 
 DIST_DIRS := find * -type d -exec
 
-DOCKER_IMAGE_NAME := k8sec
+DOCKER_REPOSITORY := quay.io
+DOCKER_IMAGE_NAME := $(DOCKER_REPOSITORY)/dtan4/k8sec
 DOCKER_IMAGE_TAG  ?= latest
 DOCKER_IMAGE      := $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)
 
@@ -15,6 +16,11 @@ DOCKER_IMAGE      := $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)
 
 bin/$(NAME): $(SRCS)
 	go build $(LDFLAGS) -o bin/$(NAME)
+
+.PHONY: ci-docker-release
+ci-docker-release: docker-build
+	@docker login -u="$(DOCKER_QUAY_USERNAME)" -p="$(DOCKER_QUAY_PASSWORD)" $(DOCKER_REPOSITORY)
+	docker push $(DOCKER_IMAGE)
 
 .PHONY: clean
 clean:
@@ -45,17 +51,7 @@ dist:
 
 .PHONY: docker-build
 docker-build:
-ifeq ($(findstring ELF 64-bit LSB,$(shell file bin/$(NAME) 2> /dev/null)),)
-	@echo "bin/$(NAME) is not a Linux 64bit binary."
-	@exit 1
-endif
 	docker build -t $(DOCKER_IMAGE) .
-
-.PHONY: docker-test
-docker-test:
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 $(MAKE)
-	$(MAKE) docker-build
-	docker run --rm $(DOCKER_IMAGE) version
 
 .PHONY: fast
 fast:

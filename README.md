@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/dtan4/k8sec.svg?branch=master)](https://travis-ci.org/dtan4/k8sec)
 [![GitHub release](https://img.shields.io/github/release/dtan4/k8sec.svg)](https://github.com/dtan4/k8sec/releases)
+[![Docker Repository on Quay](https://quay.io/repository/dtan4/k8sec/status "Docker Repository on Quay")](https://quay.io/repository/dtan4/k8sec)
 
 CLI tool to manage [Kubernetes Secrets](http://kubernetes.io/docs/user-guide/secrets/) easily
 
@@ -35,7 +36,7 @@ $ make install
 
 ### Docker image
 
-Docker image is available at [`quay.io/dtan4/k8sec`](https://quay.io/repository/dtan4/k8sec). This image is maintained at https://github.com/dtan4/dockerfile-k8sec .
+Docker image is available at [`quay.io/dtan4/k8sec`](https://quay.io/repository/dtan4/k8sec).
 
 ## Usage
 
