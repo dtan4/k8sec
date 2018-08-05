@@ -27,3 +27,13 @@ deploy:
     file: 'dist/*.{tar.gz,zip}'
     on:
       tags: true
+  - provider: script
+    skip_cleanup: true
+    script: make ci-docker-release
+    on:
+      branch: master
+  - provider: script
+    skip_cleanup: true
+    script: DOCKER_IMAGE_TAG=$TRAVIS_TAG make ci-docker-release
+    on:
+      tags: true
