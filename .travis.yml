@@ -5,6 +5,9 @@ branches:
   only:
     - master
 language: go
+cache:
+  directories:
+    - vendor
 go:
   - '1.10.3'
 before_install:
