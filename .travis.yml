@@ -16,7 +16,6 @@ install:
   - make deps
 script:
   - make test
-  - make docker-test
 before_deploy:
   - make cross-build
   - make dist
