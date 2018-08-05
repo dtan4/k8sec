@@ -45,10 +45,6 @@ dist:
 
 .PHONY: docker-build
 docker-build:
-ifeq ($(findstring ELF 64-bit LSB,$(shell file bin/$(NAME) 2> /dev/null)),)
-	@echo "bin/$(NAME) is not a Linux 64bit binary."
-	@exit 1
-endif
 	docker build -t $(DOCKER_IMAGE) .
 
 .PHONY: docker-test
