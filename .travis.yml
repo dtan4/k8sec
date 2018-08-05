@@ -6,7 +6,7 @@ branches:
     - master
 language: go
 go:
-  - '1.8'
+  - '1.10.3'
 before_install:
   - sudo add-apt-repository ppa:masterminds/glide -y
   - sudo apt-get update -q
