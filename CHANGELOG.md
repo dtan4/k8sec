@@ -1,3 +1,18 @@
+# [v0.6.0](https://github.com/dtan4/k8sec/releases/tag/v0.5.1) (2018-08-05)
+
+## Features
+
+- Enable external auth providers [#32](https://github.com/dtan4/k8stail/pull/32)
+
+## Fixed
+
+- Exclude namespace from kubeclient [#28](https://github.com/dtan4/k8sec/pull/28)
+
+## Others
+
+- Use Go 1.10.3 on Travis CI [#34](https://github.com/dtan4/k8stail/pull/34)
+- Upgrade to client-go 8.0.0 [#31](https://github.com/dtan4/k8stail/pull/31)
+
 # [v0.5.1](https://github.com/dtan4/k8sec/releases/tag/v0.5.1) (2017-08-25)
 
 ## Fixed
