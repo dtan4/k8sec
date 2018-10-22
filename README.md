@@ -14,10 +14,10 @@ Kubernetes 1.3 or above
 
 ### Using Homebrew (OS X only)
 
-Formula is available at [dtan4/homebrew-dtan4](https://github.com/dtan4/homebrew-dtan4).
+Formula is available at [dtan4/homebrew-dtan4](https://github.com/dtan4/homebrew-tools).
 
 ```bash
-$ brew tap dtan4/dtan4
+$ brew tap dtan4/tools
 $ brew install k8sec
 ```
 
