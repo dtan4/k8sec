@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 
 	"github.com/dtan4/k8sec/k8s"
@@ -74,6 +75,8 @@ func doDump(cmd *cobra.Command, args []string) error {
 			}
 		}
 	}
+
+	sort.Strings(lines)
 
 	if dumpOpts.filename != "" {
 		f, err := os.Create(dumpOpts.filename)
