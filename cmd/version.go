@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/dtan4/k8sec/version"
+	"github.com/wantedly/k8sec/version"
 	"github.com/spf13/cobra"
 )
 

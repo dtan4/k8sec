@@ -1,4 +1,4 @@
-package: github.com/dtan4/k8sec
+package: github.com/wantedly/k8sec
 import:
 - package: k8s.io/client-go
   version: ~8.0.0

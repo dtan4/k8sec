@@ -1,8 +1,8 @@
 # k8sec
 
-[![Build Status](https://travis-ci.org/dtan4/k8sec.svg?branch=master)](https://travis-ci.org/dtan4/k8sec)
-[![GitHub release](https://img.shields.io/github/release/dtan4/k8sec.svg)](https://github.com/dtan4/k8sec/releases)
-[![Docker Repository on Quay](https://quay.io/repository/dtan4/k8sec/status "Docker Repository on Quay")](https://quay.io/repository/dtan4/k8sec)
+[![Build Status](https://travis-ci.org/wantedly/k8sec.svg?branch=master)](https://travis-ci.org/wantedly/k8sec)
+[![GitHub release](https://img.shields.io/github/release/wantedly/k8sec.svg)](https://github.com/wantedly/k8sec/releases)
+[![Docker Repository on Quay](https://quay.io/repository/wantedly/k8sec/status "Docker Repository on Quay")](https://quay.io/repository/wantedly/k8sec)
 
 CLI tool to manage [Kubernetes Secrets](http://kubernetes.io/docs/user-guide/secrets/) easily
 
@@ -12,31 +12,22 @@ Kubernetes 1.3 or above
 
 ## Installation
 
-### Using Homebrew (OS X only)
-
-Formula is available at [dtan4/homebrew-dtan4](https://github.com/dtan4/homebrew-tools).
-
-```bash
-$ brew tap dtan4/tools
-$ brew install k8sec
-```
-
 ### Precompiled binary
 
-Precompiled binaries for Windows, OS X, Linux are available at [Releases](https://github.com/dtan4/k8sec/releases).
+Precompiled binaries for Windows, OS X, Linux are available at [Releases](https://github.com/wantedly/k8sec/releases).
 
 ### From source
 
 ```bash
-$ go get -d github.com/dtan4/k8sec
-$ cd $GOPATH/src/github.com/dtan4/k8sec
+$ go get -d github.com/wantedly/k8sec
+$ cd $GOPATH/src/github.com/wantedly/k8sec
 $ make deps
 $ make install
 ```
 
 ### Docker image
 
-Docker image is available at [`quay.io/dtan4/k8sec`](https://quay.io/repository/dtan4/k8sec).
+Docker image is available at [`quay.io/wantedly/k8sec`](https://quay.io/repository/wantedly/k8sec).
 
 ## Usage
 
@@ -138,7 +129,7 @@ database-url="postgres://example.com:5432/dbname"
 
 Go 1.8 or above is required.
 
-1. Fork ([https://github.com/dtan4/k8sec/fork](https://github.com/dtan4/k8sec/fork))
+1. Fork ([https://github.com/wantedly/k8sec/fork](https://github.com/wantedly/k8sec/fork))
 1. Create a feature branch
 1. Commit your changes
 1. Rebase your local changes against the master branch
@@ -149,6 +140,7 @@ Go 1.8 or above is required.
 ## Author
 
 [dtan4](https://github.com/dtan4)
+[wantedly](https://github.com/wantedly)
 
 ## License
 

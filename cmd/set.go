@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/dtan4/k8sec/k8s"
+	"github.com/wantedly/k8sec/k8s"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"k8s.io/api/core/v1"
@@ -28,7 +28,7 @@ rails
 
 Set base64-encoded value:
 
-$ echo -n dtan4 | base64
+$ echo -n wantedly | base64
 ZHRhbjQ=
 $ k8sec set --base64 rails foo=ZHRhbjQ=
 rails
@@ -38,7 +38,7 @@ Result:
 $ k8sec list rails
 NAME    TYPE    KEY             VALUE
 rails   Opaque  database-url    "postgres://example.com:5432/dbname"
-rails   Opaque  foo             "dtan4"
+rails   Opaque  foo             "wantedly"
 `,
 	RunE: doSet,
 }

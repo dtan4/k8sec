@@ -3,12 +3,12 @@ VERSION := v0.6.0
 REVISION := $(shell git rev-parse --short HEAD)
 
 SRCS    := $(shell find . -type f -name '*.go')
-LDFLAGS := -ldflags="-s -w -X \"github.com/dtan4/k8sec/version.Version=$(VERSION)\" -X \"github.com/dtan4/k8sec/version.Revision=$(REVISION)\" -extldflags -static"
+LDFLAGS := -ldflags="-s -w -X \"github.com/wantedly/k8sec/version.Version=$(VERSION)\" -X \"github.com/wantedly/k8sec/version.Revision=$(REVISION)\" -extldflags -static"
 
 DIST_DIRS := find * -type d -exec
 
 DOCKER_REPOSITORY := quay.io
-DOCKER_IMAGE_NAME := $(DOCKER_REPOSITORY)/dtan4/k8sec
+DOCKER_IMAGE_NAME := $(DOCKER_REPOSITORY)/wantedly/k8sec
 DOCKER_IMAGE_TAG  ?= latest
 DOCKER_IMAGE      := $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)
 
