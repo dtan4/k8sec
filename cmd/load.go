@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/dtan4/k8sec/k8s"
+	"github.com/wantedly/k8sec/k8s"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
