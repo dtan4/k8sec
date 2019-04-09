@@ -1,3 +1,13 @@
+# [v0.7.0](https://github.com/dtan4/k8sec/releases/tag/v0.7.0) (2019-04-09)
+
+## Features
+
+- Sort secrets on dump subcommand [#1](https://github.com/wantedly/k8sec/pull/1)
+
+## Others
+
+- Fork repository [#2](https://github.com/wantedly/k8sec/pull/2)
+
 # [v0.6.0](https://github.com/dtan4/k8sec/releases/tag/v0.5.1) (2018-08-05)
 
 ## Features
