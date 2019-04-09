@@ -1,5 +1,5 @@
 NAME := k8sec
-VERSION := v0.6.0
+VERSION := v0.7.0
 REVISION := $(shell git rev-parse --short HEAD)
 
 SRCS    := $(shell find . -type f -name '*.go')

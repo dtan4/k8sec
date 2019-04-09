@@ -1,9 +1,6 @@
 sudo: required
 services:
   - docker
-branches:
-  only:
-    - master
 language: go
 cache:
   directories:
