@@ -36,10 +36,6 @@ cross-build:
 		done; \
 	done
 
-.PHONY: deps
-deps: glide
-	glide install
-
 .PHONY: dist
 dist:
 	cd dist && \
@@ -57,12 +53,6 @@ docker-build:
 fast:
 	go build $(LDFLAGS) -o bin/$(NAME)
 
-.PHONY: glide
-glide:
-ifeq ($(shell command -v glide 2> /dev/null),)
-	curl https://glide.sh/get | sh
-endif
-
 .PHONY: install
 install:
 	go install $(LDFLAGS)
@@ -74,4 +64,4 @@ release:
 
 .PHONY: test
 test:
-	go test -cover -v `glide novendor`
+	go test -cover -v ./...
