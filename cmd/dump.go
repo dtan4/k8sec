@@ -13,6 +13,7 @@ import (
 
 var dumpOpts = struct {
 	filename string
+	noquotes bool
 }{}
 
 // dumpCmd represents the dump command
@@ -29,6 +30,12 @@ Save as .env:
 $ k8sec dump -f .env rails
 $ cat .env
 database-url="postgres://example.com:5432/dbname"
+
+Save as .env without quotes:
+
+$ k8sec dump -f .env --noquotes rails
+$ cat .env
+database-url=postgres://example.com:5432/dbname
 `,
 	RunE: doDump,
 }
@@ -60,7 +67,11 @@ func doDump(cmd *cobra.Command, args []string) error {
 		}
 
 		for key, value := range secret.Data {
-			lines = append(lines, key+"="+strconv.Quote(string(value)))
+			line := string(value)
+			if !dumpOpts.noquotes {
+				line = strconv.Quote(line)
+			}
+			lines = append(lines, key+"="+line)
 		}
 	} else {
 		secrets, err := k8sclient.ListSecrets(namespace)
@@ -70,7 +81,11 @@ func doDump(cmd *cobra.Command, args []string) error {
 
 		for _, secret := range secrets.Items {
 			for key, value := range secret.Data {
-				lines = append(lines, key+"="+strconv.Quote(string(value)))
+				line := string(value)
+				if !dumpOpts.noquotes {
+					line = strconv.Quote(line)
+				}
+				lines = append(lines, key+"="+line)
 			}
 		}
 	}
@@ -105,4 +120,5 @@ func init() {
 	RootCmd.AddCommand(dumpCmd)
 
 	dumpCmd.Flags().StringVarP(&dumpOpts.filename, "filename", "f", "", "File to dump")
+	dumpCmd.Flags().BoolVar(&dumpOpts.noquotes, "noquotes", false, "Dump without quotes")
 }
