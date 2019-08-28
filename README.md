@@ -54,12 +54,18 @@ Docker image is available at [`quay.io/dtan4/k8sec`](https://quay.io/repository/
 List secrets
 
 ```bash
-$ k8sec list [--base64] [NAME]
+$ k8sec list [--base64] [--ignore-helm-releases] [NAME]
 
 # Example
 $ k8sec list rails
 NAME    TYPE    KEY             VALUE
 rails   Opaque  database-url    "postgres://example.com:5432/dbname"
+
+# Show values without secrets with helm/release type:
+$ k8sec list --ignore-helm-releases
+NAME    TYPE    KEY             VALUE
+rails   Opaque  database-url    "postgres://example.com:5432/dbname"
+```
 
 # Show values as base64-encoded string
 $ k8sec list --base64 rails

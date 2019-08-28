@@ -15,7 +15,8 @@ import (
 )
 
 var listOpts = struct {
-	base64encode bool
+	base64encode       bool
+	ignoreHelmReleases bool
 }{}
 
 // listCmd represents the list command
@@ -25,6 +26,12 @@ var listCmd = &cobra.Command{
 	Long: `List secrets
 
 $ k8sec list rails
+NAME    TYPE    KEY             VALUE
+rails   Opaque  database-url    "postgres://example.com:5432/dbname"
+
+Show values without secrets with helm/release type:
+
+$ k8sec list --ignore-helm-releases
 NAME    TYPE    KEY             VALUE
 rails   Opaque  database-url    "postgres://example.com:5432/dbname"
 
@@ -106,6 +113,10 @@ func doList(cmd *cobra.Command, args []string) error {
 				k, v string
 			}{}
 
+			if listOpts.ignoreHelmReleases && string(secret.Type) == "helm.sh/release" {
+				continue
+			}
+
 			for key, value := range secret.Data {
 				if listOpts.base64encode {
 					v = base64.StdEncoding.EncodeToString(value)
@@ -150,4 +161,5 @@ func init() {
 	RootCmd.AddCommand(listCmd)
 
 	listCmd.Flags().BoolVar(&listOpts.base64encode, "base64", false, "Show values as base64-encoded string")
+	listCmd.Flags().BoolVar(&listOpts.ignoreHelmReleases, "ignore-helm-releases", false, "Ignore secrets with type helm.sh/release")
 }
