@@ -9,7 +9,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/dtan4/k8sec/k8s"
+	"github.com/dtan4/k8sec/client"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -49,7 +49,7 @@ func doList(cmd *cobra.Command, args []string) error {
 		return errors.New("Too many arguments.")
 	}
 
-	k8sclient, err := k8s.NewKubeClient(rootOpts.kubeconfig, rootOpts.context)
+	k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
 	if err != nil {
 		return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
 	}

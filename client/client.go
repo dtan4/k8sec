@@ -1,4 +1,4 @@
-package k8s
+package client
 
 import (
 	"k8s.io/api/core/v1"
@@ -9,14 +9,14 @@ import (
 	"k8s.io/client-go/tools/clientcmd/api"
 )
 
-// KubeClient represents Kubernetes client and calculated namespace
-type KubeClient struct {
-	clientset *kubernetes.Clientset
+// Client represents Kubernetes client and calculated namespace
+type Client struct {
+	clientset kubernetes.Interface
 	rawConfig api.Config
 }
 
-// NewKubeClient creates new Kubernetes API client
-func NewKubeClient(kubeconfig, context string) (*KubeClient, error) {
+// New creates new Kubernetes API client
+func New(kubeconfig, context string) (*Client, error) {
 	if kubeconfig == "" {
 		kubeconfig = clientcmd.RecommendedHomeFile
 	}
@@ -41,14 +41,14 @@ func NewKubeClient(kubeconfig, context string) (*KubeClient, error) {
 		return nil, err
 	}
 
-	return &KubeClient{
+	return &Client{
 		clientset: clientset,
 		rawConfig: rawConfig,
 	}, nil
 }
 
 // DefaultNamespace returns the default namespace in kubeconfig
-func (c *KubeClient) DefaultNamespace() string {
+func (c *Client) DefaultNamespace() string {
 	var namespace string
 
 	if c.rawConfig.Contexts[c.rawConfig.CurrentContext].Namespace == "" {
@@ -61,21 +61,21 @@ func (c *KubeClient) DefaultNamespace() string {
 }
 
 // CreateSecret creates new Secret
-func (c *KubeClient) CreateSecret(namespace string, secret *v1.Secret) (*v1.Secret, error) {
+func (c *Client) CreateSecret(namespace string, secret *v1.Secret) (*v1.Secret, error) {
 	return c.clientset.Core().Secrets(namespace).Create(secret)
 }
 
 // GetSecret returns secret with the given name
-func (c *KubeClient) GetSecret(namespace, name string) (*v1.Secret, error) {
+func (c *Client) GetSecret(namespace, name string) (*v1.Secret, error) {
 	return c.clientset.Core().Secrets(namespace).Get(name, metav1.GetOptions{})
 }
 
 // ListSecrets returns the list of Secrets
-func (c *KubeClient) ListSecrets(namespace string) (*v1.SecretList, error) {
+func (c *Client) ListSecrets(namespace string) (*v1.SecretList, error) {
 	return c.clientset.Core().Secrets(namespace).List(metav1.ListOptions{})
 }
 
 // UpdateSecret updates the existed secret
-func (c *KubeClient) UpdateSecret(namespace string, secret *v1.Secret) (*v1.Secret, error) {
+func (c *Client) UpdateSecret(namespace string, secret *v1.Secret) (*v1.Secret, error) {
 	return c.clientset.Core().Secrets(namespace).Update(secret)
 }
