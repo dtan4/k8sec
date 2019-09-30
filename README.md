@@ -1,6 +1,7 @@
 # k8sec
 
 [![Build Status](https://travis-ci.org/dtan4/k8sec.svg?branch=master)](https://travis-ci.org/dtan4/k8sec)
+[![codecov](https://codecov.io/gh/dtan4/k8sec/branch/master/graph/badge.svg)](https://codecov.io/gh/dtan4/k8sec)
 [![GitHub release](https://img.shields.io/github/release/dtan4/k8sec.svg)](https://github.com/dtan4/k8sec/releases)
 [![Docker Repository on Quay](https://quay.io/repository/dtan4/k8sec/status "Docker Repository on Quay")](https://quay.io/repository/dtan4/k8sec)
 
