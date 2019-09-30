@@ -11,7 +11,7 @@ import (
 
 // KubeClient represents Kubernetes client and calculated namespace
 type KubeClient struct {
-	clientset *kubernetes.Clientset
+	clientset kubernetes.Interface
 	rawConfig api.Config
 }
 
