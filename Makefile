@@ -2,8 +2,9 @@ NAME := k8sec
 VERSION := v0.6.0
 REVISION := $(shell git rev-parse --short HEAD)
 
-SRCS    := $(shell find . -type f -name '*.go')
-LDFLAGS := -ldflags="-s -w -X \"github.com/dtan4/k8sec/version.Version=$(VERSION)\" -X \"github.com/dtan4/k8sec/version.Revision=$(REVISION)\" -extldflags -static"
+SRCS     := $(shell find . -type f -name '*.go')
+LDFLAGS  := -ldflags="-s -w -X \"github.com/dtan4/k8sec/version.Version=$(VERSION)\" -X \"github.com/dtan4/k8sec/version.Revision=$(REVISION)\" -extldflags -static"
+NOVENDOR := $(shell glide novendor)
 
 DIST_DIRS := find * -type d -exec
 
@@ -21,6 +22,18 @@ bin/$(NAME): $(SRCS)
 ci-docker-release: docker-build
 	@docker login -u="$(DOCKER_QUAY_USERNAME)" -p="$(DOCKER_QUAY_PASSWORD)" $(DOCKER_REPOSITORY)
 	docker push $(DOCKER_IMAGE)
+
+.PHONY: ci-test
+ci-test:
+	echo "" > coverage.txt
+	set -e; \
+	for d in $(NOVENDOR); do \
+		go test -coverprofile=profile.out -covermode=atomic -v $$d; \
+		if [ -f profile.out ]; then \
+			cat profile.out >> coverage.txt; \
+			rm profile.out; \
+		fi; \
+	done
 
 .PHONY: clean
 clean:
@@ -74,4 +87,4 @@ release:
 
 .PHONY: test
 test:
-	go test -cover -v `glide novendor`
+	go test -cover -v $(NOVENDOR)
