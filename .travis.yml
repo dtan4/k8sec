@@ -18,7 +18,9 @@ before_install:
 install:
   - make deps
 script:
-  - make test
+  - make ci-test
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
 before_deploy:
   - make cross-build
   - make dist
