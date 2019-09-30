@@ -38,7 +38,7 @@ func doDump(cmd *cobra.Command, args []string) error {
 		return errors.New("Too many arguments.")
 	}
 
-	k8sclient, err := client.NewKubeClient(rootOpts.kubeconfig, rootOpts.context)
+	k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
 	if err != nil {
 		return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
 	}

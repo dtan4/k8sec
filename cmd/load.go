@@ -72,7 +72,7 @@ func doLoad(cmd *cobra.Command, args []string) error {
 		data[k] = []byte(_v)
 	}
 
-	k8sclient, err := client.NewKubeClient(rootOpts.kubeconfig, rootOpts.context)
+	k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
 	if err != nil {
 		return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
 	}

@@ -15,8 +15,8 @@ type KubeClient struct {
 	rawConfig api.Config
 }
 
-// NewKubeClient creates new Kubernetes API client
-func NewKubeClient(kubeconfig, context string) (*KubeClient, error) {
+// New creates new Kubernetes API client
+func New(kubeconfig, context string) (*KubeClient, error) {
 	if kubeconfig == "" {
 		kubeconfig = clientcmd.RecommendedHomeFile
 	}
