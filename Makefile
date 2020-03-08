@@ -13,10 +13,12 @@ DOCKER_IMAGE_NAME := $(DOCKER_REPOSITORY)/dtan4/k8sec
 DOCKER_IMAGE_TAG  ?= latest
 DOCKER_IMAGE      := $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)
 
+export GO111MODULE=on
+
 .DEFAULT_GOAL := bin/$(NAME)
 
 bin/$(NAME): $(SRCS)
-	GO111MODULE=on go build $(LDFLAGS) -o bin/$(NAME)
+	go build $(LDFLAGS) -o bin/$(NAME)
 
 .PHONY: ci-docker-release
 ci-docker-release: docker-build
@@ -25,7 +27,7 @@ ci-docker-release: docker-build
 
 .PHONY: ci-test
 ci-test:
-	GO111MODULE=on go test -coverpkg=./... -coverprofile=coverage.txt -v ./...
+	go test -coverpkg=./... -coverprofile=coverage.txt -v ./...
 
 .PHONY: clean
 clean:
@@ -37,7 +39,7 @@ clean:
 cross-build:
 	for os in darwin linux windows; do \
 		for arch in amd64 386; do \
-			GOOS=$$os GOARCH=$$arch CGO_ENABLED=0 GO111MODULE=on go build -a -tags netgo -installsuffix netgo $(LDFLAGS) -o dist/$$os-$$arch/$(NAME); \
+			GOOS=$$os GOARCH=$$arch CGO_ENABLED=0 go build -a -tags netgo -installsuffix netgo $(LDFLAGS) -o dist/$$os-$$arch/$(NAME); \
 		done; \
 	done
 .PHONY: dist
@@ -55,11 +57,11 @@ docker-build:
 
 .PHONY: fast
 fast:
-	GO111MODULE=on go build $(LDFLAGS) -o bin/$(NAME)
+	go build $(LDFLAGS) -o bin/$(NAME)
 
 .PHONY: install
 install:
-	GO111MODULE=on go install $(LDFLAGS)
+	go install $(LDFLAGS)
 
 .PHONY: release
 release:
