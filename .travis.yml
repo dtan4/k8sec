@@ -9,7 +9,7 @@ cache:
   directories:
     - vendor
 go:
-  - '1.10.3'
+  - '1.14'
 before_install:
   - sudo add-apt-repository ppa:masterminds/glide -y
   - sudo apt-get update -q
