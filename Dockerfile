@@ -1,9 +1,7 @@
-FROM golang:1.10.3 AS builder
+FROM golang:1.14 AS builder
 
 WORKDIR /go/src/github.com/dtan4/k8sec
 COPY . /go/src/github.com/dtan4/k8sec
-
-RUN make deps
 
 RUN CGO_ENABLED=0 make
 
