@@ -48,7 +48,7 @@ func TestCreateSecret(t *testing.T) {
 				t.Errorf("secret name want %q, got %q", s.Name, secret.Name)
 			}
 
-			if _, err := clientset.Core().Secrets(tc.namespace).Get(tc.name, metav1.GetOptions{}); err != nil {
+			if _, err := clientset.CoreV1().Secrets(tc.namespace).Get(tc.name, metav1.GetOptions{}); err != nil {
 				t.Errorf("secret %s not found, error: %q", tc.name, err)
 			}
 		})
@@ -190,7 +190,7 @@ func TestUpdateSecret(t *testing.T) {
 				t.Errorf("want no error, got %q", err)
 			}
 
-			s, err := clientset.Core().Secrets(tc.namespace).Get(tc.oldSecret.Name, metav1.GetOptions{})
+			s, err := clientset.CoreV1().Secrets(tc.namespace).Get(tc.oldSecret.Name, metav1.GetOptions{})
 			if err != nil {
 				t.Errorf("secret %q not found, error: %q", tc.oldSecret.Name, err)
 			}

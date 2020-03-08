@@ -62,20 +62,20 @@ func (c *Client) DefaultNamespace() string {
 
 // CreateSecret creates new Secret
 func (c *Client) CreateSecret(namespace string, secret *v1.Secret) (*v1.Secret, error) {
-	return c.clientset.Core().Secrets(namespace).Create(secret)
+	return c.clientset.CoreV1().Secrets(namespace).Create(secret)
 }
 
 // GetSecret returns secret with the given name
 func (c *Client) GetSecret(namespace, name string) (*v1.Secret, error) {
-	return c.clientset.Core().Secrets(namespace).Get(name, metav1.GetOptions{})
+	return c.clientset.CoreV1().Secrets(namespace).Get(name, metav1.GetOptions{})
 }
 
 // ListSecrets returns the list of Secrets
 func (c *Client) ListSecrets(namespace string) (*v1.SecretList, error) {
-	return c.clientset.Core().Secrets(namespace).List(metav1.ListOptions{})
+	return c.clientset.CoreV1().Secrets(namespace).List(metav1.ListOptions{})
 }
 
 // UpdateSecret updates the existed secret
 func (c *Client) UpdateSecret(namespace string, secret *v1.Secret) (*v1.Secret, error) {
-	return c.clientset.Core().Secrets(namespace).Update(secret)
+	return c.clientset.CoreV1().Secrets(namespace).Update(secret)
 }
