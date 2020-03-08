@@ -4,7 +4,7 @@ REVISION := $(shell git rev-parse --short HEAD)
 
 SRCS     := $(shell find . -type f -name '*.go')
 LDFLAGS  := -ldflags="-s -w -X \"github.com/dtan4/k8sec/version.Version=$(VERSION)\" -X \"github.com/dtan4/k8sec/version.Revision=$(REVISION)\" -extldflags -static"
-NOVENDOR := $(shell glide novendor)
+NOVENDOR := $(shell go list ./... | grep -v vendor)
 
 DIST_DIRS := find * -type d -exec
 
@@ -12,6 +12,8 @@ DOCKER_REPOSITORY := quay.io
 DOCKER_IMAGE_NAME := $(DOCKER_REPOSITORY)/dtan4/k8sec
 DOCKER_IMAGE_TAG  ?= latest
 DOCKER_IMAGE      := $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)
+
+export GO111MODULE=on
 
 .DEFAULT_GOAL := bin/$(NAME)
 
@@ -25,15 +27,7 @@ ci-docker-release: docker-build
 
 .PHONY: ci-test
 ci-test:
-	echo "" > coverage.txt
-	set -e; \
-	for d in $(NOVENDOR); do \
-		go test -coverprofile=profile.out -covermode=atomic -v $$d; \
-		if [ -f profile.out ]; then \
-			cat profile.out >> coverage.txt; \
-			rm profile.out; \
-		fi; \
-	done
+	go test -coverpkg=./... -coverprofile=coverage.txt -v ./...
 
 .PHONY: clean
 clean:
@@ -48,11 +42,6 @@ cross-build:
 			GOOS=$$os GOARCH=$$arch CGO_ENABLED=0 go build -a -tags netgo -installsuffix netgo $(LDFLAGS) -o dist/$$os-$$arch/$(NAME); \
 		done; \
 	done
-
-.PHONY: deps
-deps: glide
-	glide install
-
 .PHONY: dist
 dist:
 	cd dist && \
@@ -69,12 +58,6 @@ docker-build:
 .PHONY: fast
 fast:
 	go build $(LDFLAGS) -o bin/$(NAME)
-
-.PHONY: glide
-glide:
-ifeq ($(shell command -v glide 2> /dev/null),)
-	curl https://glide.sh/get | sh
-endif
 
 .PHONY: install
 install:
