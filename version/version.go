@@ -5,13 +5,12 @@ import (
 )
 
 var (
-	// Version represents version number
-	Version string
-	// Revision represents commit hash at built binary
-	Revision string
+	version string
+	commit  string
+	date    string
 )
 
 // String returns version string
 func String() string {
-	return fmt.Sprintf("k8sec version %s, build %s", Version, Revision)
+	return fmt.Sprintf("k8sec version: %s, commit: %s, build at: %s", version, commit, date)
 }
