@@ -23,7 +23,7 @@ jobs:
         run: |
           go mod tidy
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v1
+        uses: peter-evans/create-pull-request@v2
         with:
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           commit-message: "go mod tidy"
