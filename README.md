@@ -1,6 +1,7 @@
 # k8sec
 
 [![GitHub Actions](https://github.com/dtan4/k8sec/workflows/Test/badge.svg)](https://github.com/dtan4/k8sec/actions?query=workflow%3ATest+branch%3Amaster)
+[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=dtan4/k8sec)](https://dependabot.com)
 [![codecov](https://codecov.io/gh/dtan4/k8sec/branch/master/graph/badge.svg)](https://codecov.io/gh/dtan4/k8sec)
 [![GitHub release](https://img.shields.io/github/release/dtan4/k8sec.svg)](https://github.com/dtan4/k8sec/releases)
 [![Docker Repository on Quay](https://quay.io/repository/dtan4/k8sec/status "Docker Repository on Quay")](https://quay.io/repository/dtan4/k8sec)
