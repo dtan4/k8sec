@@ -1,9 +1,10 @@
 NAME := k8sec
 VERSION := v0.6.0
-REVISION := $(shell git rev-parse --short HEAD)
+COMMIT := $(shell git rev-parse HEAD)
+DATE := $(shell date "+%Y-%m-%dT%H:%M:%S%z")
 
 SRCS     := $(shell find . -type f -name '*.go')
-LDFLAGS  := -ldflags="-s -w -X \"github.com/dtan4/k8sec/version.Version=$(VERSION)\" -X \"github.com/dtan4/k8sec/version.Revision=$(REVISION)\" -extldflags -static"
+LDFLAGS  := -ldflags="-s -w -X \"github.com/dtan4/k8sec/version.version=$(VERSION)\" -X \"github.com/dtan4/k8sec/version.commit=$(COMMIT)\" -X \"github.com/dtan4/k8sec/version.date=$(DATE)\" -extldflags -static"
 NOVENDOR := $(shell go list ./... | grep -v vendor)
 
 export GO111MODULE=on
