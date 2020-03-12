@@ -27,15 +27,7 @@ ci-docker-release: docker-build
 
 .PHONY: ci-test
 ci-test:
-	echo "" > coverage.txt
-	set -e; \
-	for d in $(NOVENDOR); do \
-		go test -coverprofile=profile.out -covermode=atomic -v $$d; \
-		if [ -f profile.out ]; then \
-			cat profile.out >> coverage.txt; \
-			rm profile.out; \
-		fi; \
-	done
+	go test -coverpkg=./... -coverprofile=coverage.txt -v ./...
 
 .PHONY: clean
 clean:
