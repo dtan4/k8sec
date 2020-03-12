@@ -1,0 +1,41 @@
+name: go mod tidy
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "go.mod"
+      - "go.sum"
+      - ".github/workflows/go-mod-tidy.yaml"
+
+jobs:
+  go-mod-tidy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Setup Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.14
+      - name: go mod tidy
+        run: |
+          go mod tidy
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v2
+        with:
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          commit-message: "go mod tidy"
+          title: "Run `go mod tidy`"
+          body: |
+            ## WHAT
+            Run `go mod tidy`
+
+            This pull request was created by [create-pull-request](https://github.com/peter-evans/create-pull-request).
+
+            ## WHY
+
+            Current `go.mod` and `go.sum` don't match the source code.
+          branch: go-mod-tidy
+          branch-suffix: timestamp
