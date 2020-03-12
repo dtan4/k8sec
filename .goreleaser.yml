@@ -5,7 +5,9 @@ before:
     - make clean
     - go mod tidy
 builds:
-- env:
+- ldflags:
+  - "-s -w -X github.com/dtan4/k8sec/version.version={{.Version}} -X github.com/dtan4/k8sec/version.commit={{.Commit}} -X github.com/dtan4/k8sec/version.date={{.Date}} -X github.com/dtan4/k8sec/version.builtBy=goreleaser"
+  env:
   - CGO_ENABLED=0
   goos:
   - darwin
