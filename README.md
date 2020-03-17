@@ -124,7 +124,7 @@ $ cat .env | k8sec load rails
 Dump secrets as dotenv (key=value) format
 
 ```bash
-$ k8sec dump [-f FILENAME] [NAME]
+$ k8sec dump [-f FILENAME] [--noquotes] [NAME]
 
 # Example
 $ k8sec dump rails
@@ -134,6 +134,12 @@ database-url="postgres://example.com:5432/dbname"
 $ k8sec dump -f .env rails
 $ cat .env
 database-url="postgres://example.com:5432/dbname"
+```
+
+# Save as .env without qoutes
+$ k8sec dump -f .env --noquotes rails
+$ cat .env
+database-url=postgres://example.com:5432/dbname
 ```
 
 ## Contribution
