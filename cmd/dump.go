@@ -76,9 +76,7 @@ func doDump(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	sort.Slice(lines, func(i, j int) bool {
-		return lines[i] < lines[j]
-	})
+	sort.Strings(lines)
 
 	if dumpOpts.filename != "" {
 		f, err := os.Create(dumpOpts.filename)
