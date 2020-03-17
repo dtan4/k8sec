@@ -81,11 +81,11 @@ func doDump(cmd *cobra.Command, args []string) error {
 
 		for _, secret := range secrets.Items {
 			for key, value := range secret.Data {
-				line := string(value)
+				v := string(value)
 				if !dumpOpts.noquotes {
-					line = strconv.Quote(line)
+					v = strconv.Quote(v)
 				}
-				lines = append(lines, key+"="+line)
+				lines = append(lines, key+"="+v)
 			}
 		}
 	}
