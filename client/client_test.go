@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/fake"
@@ -35,7 +35,7 @@ func TestCreateSecret(t *testing.T) {
 			}
 
 			clientset := fake.NewSimpleClientset()
-			client := &Client{
+			client := &clientImpl{
 				clientset: clientset,
 			}
 
@@ -82,7 +82,7 @@ func TestGetSecret(t *testing.T) {
 			}
 
 			clientset := fake.NewSimpleClientset(secret)
-			client := &Client{
+			client := &clientImpl{
 				clientset: clientset,
 			}
 
@@ -132,7 +132,7 @@ func TestListSecrets(t *testing.T) {
 	for name, tc := range testcases {
 		t.Run(name, func(t *testing.T) {
 			clientset := fake.NewSimpleClientset(tc.secrets...)
-			client := &Client{
+			client := &clientImpl{
 				clientset: clientset,
 			}
 
@@ -181,7 +181,7 @@ func TestUpdateSecret(t *testing.T) {
 	for name, tc := range testcases {
 		t.Run(name, func(t *testing.T) {
 			clientset := fake.NewSimpleClientset(tc.oldSecret)
-			client := &Client{
+			client := &clientImpl{
 				clientset: clientset,
 			}
 
