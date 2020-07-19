@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -19,6 +20,8 @@ var unsetCmd = &cobra.Command{
 			return errors.New("Too few arguments.")
 		}
 
+		ctx := context.Background()
+
 		k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
 		if err != nil {
 			return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
@@ -32,14 +35,14 @@ var unsetCmd = &cobra.Command{
 			namespace = k8sclient.DefaultNamespace()
 		}
 
-		return runUnset(k8sclient, namespace, args, os.Stdout)
+		return runUnset(ctx, k8sclient, namespace, args, os.Stdout)
 	},
 }
 
-func runUnset(k8sclient client.Client, namespace string, args []string, out io.Writer) error {
+func runUnset(ctx context.Context, k8sclient client.Client, namespace string, args []string, out io.Writer) error {
 	name := args[0]
 
-	s, err := k8sclient.GetSecret(namespace, name)
+	s, err := k8sclient.GetSecret(ctx, namespace, name)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to get current secret. name=%s", name)
 	}
@@ -53,7 +56,7 @@ func runUnset(k8sclient client.Client, namespace string, args []string, out io.W
 		delete(s.Data, k)
 	}
 
-	_, err = k8sclient.UpdateSecret(namespace, s)
+	_, err = k8sclient.UpdateSecret(ctx, namespace, s)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to unset secret. name=%s", name)
 	}

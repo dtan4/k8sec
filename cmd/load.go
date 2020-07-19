@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bufio"
+	"context"
 	"io"
 	"os"
 	"strconv"
@@ -35,6 +36,8 @@ $ cat .env | k8sec load rails
 			return errors.New("Variable name must be specified.")
 		}
 
+		ctx := context.Background()
+
 		k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
 		if err != nil {
 			return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
@@ -48,11 +51,11 @@ $ cat .env | k8sec load rails
 			namespace = k8sclient.DefaultNamespace()
 		}
 
-		return runLoad(k8sclient, namespace, args, os.Stdin, os.Stdout)
+		return runLoad(ctx, k8sclient, namespace, args, os.Stdin, os.Stdout)
 	},
 }
 
-func runLoad(k8sclient client.Client, namespace string, args []string, in io.Reader, out io.Writer) error {
+func runLoad(ctx context.Context, k8sclient client.Client, namespace string, args []string, in io.Reader, out io.Writer) error {
 	if len(args) != 1 {
 		return errors.New("Variable name must be specified.")
 	}
@@ -92,7 +95,7 @@ func runLoad(k8sclient client.Client, namespace string, args []string, in io.Rea
 		data[k] = []byte(_v)
 	}
 
-	s, err := k8sclient.GetSecret(namespace, name)
+	s, err := k8sclient.GetSecret(ctx, namespace, name)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to get secret. name=%s", name)
 	}
@@ -101,7 +104,7 @@ func runLoad(k8sclient client.Client, namespace string, args []string, in io.Rea
 		s.Data[k] = v
 	}
 
-	_, err = k8sclient.UpdateSecret(namespace, s)
+	_, err = k8sclient.UpdateSecret(ctx, namespace, s)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to set secret. name=%s", name)
 	}

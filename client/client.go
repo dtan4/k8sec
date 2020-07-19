@@ -1,6 +1,8 @@
 package client
 
 import (
+	"context"
+
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -12,10 +14,10 @@ import (
 // Client represents Kubernetes client and calculated namespace
 type Client interface {
 	DefaultNamespace() string
-	CreateSecret(namespace string, secret *v1.Secret) (*v1.Secret, error)
-	GetSecret(namespace, name string) (*v1.Secret, error)
-	ListSecrets(namespace string) (*v1.SecretList, error)
-	UpdateSecret(namespace string, secret *v1.Secret) (*v1.Secret, error)
+	CreateSecret(ctx context.Context, namespace string, secret *v1.Secret) (*v1.Secret, error)
+	GetSecret(ctx context.Context, namespace, name string) (*v1.Secret, error)
+	ListSecrets(ctx context.Context, namespace string) (*v1.SecretList, error)
+	UpdateSecret(ctx context.Context, namespace string, secret *v1.Secret) (*v1.Secret, error)
 }
 
 type clientImpl struct {
@@ -69,21 +71,21 @@ func (c *clientImpl) DefaultNamespace() string {
 }
 
 // CreateSecret creates new Secret
-func (c *clientImpl) CreateSecret(namespace string, secret *v1.Secret) (*v1.Secret, error) {
-	return c.clientset.CoreV1().Secrets(namespace).Create(secret)
+func (c *clientImpl) CreateSecret(ctx context.Context, namespace string, secret *v1.Secret) (*v1.Secret, error) {
+	return c.clientset.CoreV1().Secrets(namespace).Create(ctx, secret, metav1.CreateOptions{})
 }
 
 // GetSecret returns secret with the given name
-func (c *clientImpl) GetSecret(namespace, name string) (*v1.Secret, error) {
-	return c.clientset.CoreV1().Secrets(namespace).Get(name, metav1.GetOptions{})
+func (c *clientImpl) GetSecret(ctx context.Context, namespace, name string) (*v1.Secret, error) {
+	return c.clientset.CoreV1().Secrets(namespace).Get(ctx, name, metav1.GetOptions{})
 }
 
 // ListSecrets returns the list of Secrets
-func (c *clientImpl) ListSecrets(namespace string) (*v1.SecretList, error) {
-	return c.clientset.CoreV1().Secrets(namespace).List(metav1.ListOptions{})
+func (c *clientImpl) ListSecrets(ctx context.Context, namespace string) (*v1.SecretList, error) {
+	return c.clientset.CoreV1().Secrets(namespace).List(ctx, metav1.ListOptions{})
 }
 
 // UpdateSecret updates the existed secret
-func (c *clientImpl) UpdateSecret(namespace string, secret *v1.Secret) (*v1.Secret, error) {
-	return c.clientset.CoreV1().Secrets(namespace).Update(secret)
+func (c *clientImpl) UpdateSecret(ctx context.Context, namespace string, secret *v1.Secret) (*v1.Secret, error) {
+	return c.clientset.CoreV1().Secrets(namespace).Update(ctx, secret, metav1.UpdateOptions{})
 }

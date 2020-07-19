@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"testing"
 
@@ -60,7 +61,7 @@ func TestUnSet(t *testing.T) {
 
 			var out bytes.Buffer
 
-			err := runUnset(k8sclient, namespace, tc.args, &out)
+			err := runUnset(context.Background(), k8sclient, namespace, tc.args, &out)
 
 			if tc.wantErr != nil {
 				if err == nil {

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -44,6 +45,8 @@ database-url=postgres://example.com:5432/dbname
 			return errors.New("Too many arguments.")
 		}
 
+		ctx := context.Background()
+
 		k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
 		if err != nil {
 			return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
@@ -57,15 +60,15 @@ database-url=postgres://example.com:5432/dbname
 			namespace = k8sclient.DefaultNamespace()
 		}
 
-		return runDump(k8sclient, namespace, args, os.Stdout)
+		return runDump(ctx, k8sclient, namespace, args, os.Stdout)
 	},
 }
 
-func runDump(k8sclient client.Client, namespace string, args []string, out io.Writer) error {
+func runDump(ctx context.Context, k8sclient client.Client, namespace string, args []string, out io.Writer) error {
 	var lines []string
 
 	if len(args) == 1 {
-		secret, err := k8sclient.GetSecret(namespace, args[0])
+		secret, err := k8sclient.GetSecret(ctx, namespace, args[0])
 		if err != nil {
 			return errors.Wrapf(err, "Failed to get secret. name=%s", args[0])
 		}
@@ -78,7 +81,7 @@ func runDump(k8sclient client.Client, namespace string, args []string, out io.Wr
 			lines = append(lines, key+"="+line)
 		}
 	} else {
-		secrets, err := k8sclient.ListSecrets(namespace)
+		secrets, err := k8sclient.ListSecrets(ctx, namespace)
 		if err != nil {
 			return errors.Wrap(err, "Failed to list secret.")
 		}

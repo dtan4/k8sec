@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"encoding/base64"
 	"fmt"
 	"io"
@@ -40,6 +41,8 @@ rails   Opaque  database-url    cG9zdGdyZXM6Ly9leGFtcGxlLmNvbTo1NDMyL2RibmFtZQ==
 			return errors.New("Too many arguments.")
 		}
 
+		ctx := context.Background()
+
 		k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
 		if err != nil {
 			return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
@@ -53,7 +56,7 @@ rails   Opaque  database-url    cG9zdGdyZXM6Ly9leGFtcGxlLmNvbTo1NDMyL2RibmFtZQ==
 			namespace = k8sclient.DefaultNamespace()
 		}
 
-		return runList(k8sclient, namespace, args, os.Stdout)
+		return runList(ctx, k8sclient, namespace, args, os.Stdout)
 	},
 }
 
@@ -64,7 +67,7 @@ type Secret struct {
 	Value string
 }
 
-func runList(k8sclient client.Client, namespace string, args []string, out io.Writer) error {
+func runList(ctx context.Context, k8sclient client.Client, namespace string, args []string, out io.Writer) error {
 	w := new(tabwriter.Writer)
 	w.Init(out, 0, 8, 0, '\t', 0)
 	fmt.Fprintln(w, strings.Join([]string{"NAME", "TYPE", "KEY", "VALUE"}, "\t"))
@@ -74,7 +77,7 @@ func runList(k8sclient client.Client, namespace string, args []string, out io.Wr
 	secrets := []Secret{}
 
 	if len(args) == 1 {
-		secret, err := k8sclient.GetSecret(namespace, args[0])
+		secret, err := k8sclient.GetSecret(ctx, namespace, args[0])
 		if err != nil {
 			return errors.Wrap(err, "Failed to retrieve secrets.")
 		}
@@ -99,7 +102,7 @@ func runList(k8sclient client.Client, namespace string, args []string, out io.Wr
 			return secrets[i].Key < secrets[j].Key
 		})
 	} else {
-		ss, err := k8sclient.ListSecrets(namespace)
+		ss, err := k8sclient.ListSecrets(ctx, namespace)
 		if err != nil {
 			return errors.Wrap(err, "Failed to retrieve secrets.")
 		}
