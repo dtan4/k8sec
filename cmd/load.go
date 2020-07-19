@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bufio"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -29,10 +30,29 @@ Load from stdin:
 
 $ cat .env | k8sec load rails
 `,
-	RunE: doLoad,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if len(args) != 1 {
+			return errors.New("Variable name must be specified.")
+		}
+
+		k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
+		if err != nil {
+			return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
+		}
+
+		var namespace string
+
+		if rootOpts.namespace != "" {
+			namespace = rootOpts.namespace
+		} else {
+			namespace = k8sclient.DefaultNamespace()
+		}
+
+		return runLoad(k8sclient, namespace, args, os.Stdin, os.Stdout)
+	},
 }
 
-func doLoad(cmd *cobra.Command, args []string) error {
+func runLoad(k8sclient client.Client, namespace string, args []string, in io.Reader, out io.Writer) error {
 	if len(args) != 1 {
 		return errors.New("Variable name must be specified.")
 	}
@@ -50,7 +70,7 @@ func doLoad(cmd *cobra.Command, args []string) error {
 
 		sc = bufio.NewScanner(f)
 	} else {
-		sc = bufio.NewScanner(os.Stdin)
+		sc = bufio.NewScanner(in)
 	}
 
 	for sc.Scan() {
@@ -70,19 +90,6 @@ func doLoad(cmd *cobra.Command, args []string) error {
 		}
 
 		data[k] = []byte(_v)
-	}
-
-	k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
-	if err != nil {
-		return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
-	}
-
-	var namespace string
-
-	if rootOpts.namespace != "" {
-		namespace = rootOpts.namespace
-	} else {
-		namespace = k8sclient.DefaultNamespace()
 	}
 
 	s, err := k8sclient.GetSecret(namespace, name)
