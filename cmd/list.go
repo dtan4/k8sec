@@ -3,6 +3,7 @@ package cmd
 import (
 	"encoding/base64"
 	"fmt"
+	"io"
 	"os"
 	"sort"
 	"strconv"
@@ -34,7 +35,26 @@ $ k8sec list --base64 rails
 NAME    TYPE    KEY             VALUE
 rails   Opaque  database-url    cG9zdGdyZXM6Ly9leGFtcGxlLmNvbTo1NDMyL2RibmFtZQ==
 `,
-	RunE: doList,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if len(args) > 1 {
+			return errors.New("Too many arguments.")
+		}
+
+		k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
+		if err != nil {
+			return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
+		}
+
+		var namespace string
+
+		if rootOpts.namespace != "" {
+			namespace = rootOpts.namespace
+		} else {
+			namespace = k8sclient.DefaultNamespace()
+		}
+
+		return runList(k8sclient, namespace, args, os.Stdout)
+	},
 }
 
 type Secret struct {
@@ -44,26 +64,9 @@ type Secret struct {
 	Value string
 }
 
-func doList(cmd *cobra.Command, args []string) error {
-	if len(args) > 1 {
-		return errors.New("Too many arguments.")
-	}
-
-	k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
-	if err != nil {
-		return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
-	}
-
-	var namespace string
-
-	if rootOpts.namespace != "" {
-		namespace = rootOpts.namespace
-	} else {
-		namespace = k8sclient.DefaultNamespace()
-	}
-
+func runList(k8sclient client.Client, namespace string, args []string, out io.Writer) error {
 	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
+	w.Init(out, 0, 8, 0, '\t', 0)
 	fmt.Fprintln(w, strings.Join([]string{"NAME", "TYPE", "KEY", "VALUE"}, "\t"))
 
 	var v string
