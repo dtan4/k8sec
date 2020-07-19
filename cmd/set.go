@@ -3,12 +3,14 @@ package cmd
 import (
 	"encoding/base64"
 	"fmt"
+	"io"
+	"os"
 	"strings"
 
 	"github.com/dtan4/k8sec/client"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 )
 
 var setOpts = struct {
@@ -40,13 +42,29 @@ NAME    TYPE    KEY             VALUE
 rails   Opaque  database-url    "postgres://example.com:5432/dbname"
 rails   Opaque  foo             "dtan4"
 `,
-	RunE: doSet,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if len(args) < 2 {
+			return errors.New("Too few arguments.")
+		}
+
+		k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
+		if err != nil {
+			return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
+		}
+
+		var namespace string
+
+		if rootOpts.namespace != "" {
+			namespace = rootOpts.namespace
+		} else {
+			namespace = k8sclient.DefaultNamespace()
+		}
+
+		return runSet(k8sclient, namespace, args, os.Stdout)
+	},
 }
 
-func doSet(cmd *cobra.Command, args []string) error {
-	if len(args) < 2 {
-		return errors.New("Too few arguments.")
-	}
+func runSet(k8sclient client.Client, namespace string, args []string, out io.Writer) error {
 	name := args[0]
 
 	data := map[string][]byte{}
@@ -70,19 +88,6 @@ func doSet(cmd *cobra.Command, args []string) error {
 		} else {
 			data[k] = []byte(v)
 		}
-	}
-
-	k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
-	if err != nil {
-		return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
-	}
-
-	var namespace string
-
-	if rootOpts.namespace != "" {
-		namespace = rootOpts.namespace
-	} else {
-		namespace = k8sclient.DefaultNamespace()
 	}
 
 	ss, err := k8sclient.ListSecrets(namespace)
@@ -131,7 +136,7 @@ func doSet(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	fmt.Println(s.Name)
+	fmt.Fprintln(out, s.Name)
 
 	return nil
 }

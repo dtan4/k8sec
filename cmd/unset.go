@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"io"
+	"os"
 
 	"github.com/dtan4/k8sec/client"
 	"github.com/pkg/errors"
@@ -12,27 +14,30 @@ import (
 var unsetCmd = &cobra.Command{
 	Use:   "unset KEY1 [KEY2 ...]",
 	Short: "Unset secrets",
-	RunE:  doUnset,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if len(args) < 2 {
+			return errors.New("Too few arguments.")
+		}
+
+		k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
+		if err != nil {
+			return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
+		}
+
+		var namespace string
+
+		if rootOpts.namespace != "" {
+			namespace = rootOpts.namespace
+		} else {
+			namespace = k8sclient.DefaultNamespace()
+		}
+
+		return runUnset(k8sclient, namespace, args, os.Stdout)
+	},
 }
 
-func doUnset(cmd *cobra.Command, args []string) error {
-	if len(args) < 2 {
-		return errors.New("Too few arguments.")
-	}
+func runUnset(k8sclient client.Client, namespace string, args []string, out io.Writer) error {
 	name := args[0]
-
-	k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
-	if err != nil {
-		return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
-	}
-
-	var namespace string
-
-	if rootOpts.namespace != "" {
-		namespace = rootOpts.namespace
-	} else {
-		namespace = k8sclient.DefaultNamespace()
-	}
 
 	s, err := k8sclient.GetSecret(namespace, name)
 	if err != nil {
@@ -53,7 +58,7 @@ func doUnset(cmd *cobra.Command, args []string) error {
 		return errors.Wrapf(err, "Failed to unset secret. name=%s", name)
 	}
 
-	fmt.Println(s.Name)
+	fmt.Fprintln(out, s.Name)
 
 	return nil
 }
