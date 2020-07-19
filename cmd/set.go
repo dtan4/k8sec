@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"encoding/base64"
 	"fmt"
 	"io"
@@ -47,6 +48,8 @@ rails   Opaque  foo             "dtan4"
 			return errors.New("Too few arguments.")
 		}
 
+		ctx := context.Background()
+
 		k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
 		if err != nil {
 			return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
@@ -60,11 +63,11 @@ rails   Opaque  foo             "dtan4"
 			namespace = k8sclient.DefaultNamespace()
 		}
 
-		return runSet(k8sclient, namespace, args, os.Stdout)
+		return runSet(ctx, k8sclient, namespace, args, os.Stdout)
 	},
 }
 
-func runSet(k8sclient client.Client, namespace string, args []string, out io.Writer) error {
+func runSet(ctx context.Context, k8sclient client.Client, namespace string, args []string, out io.Writer) error {
 	name := args[0]
 
 	data := map[string][]byte{}
@@ -90,7 +93,7 @@ func runSet(k8sclient client.Client, namespace string, args []string, out io.Wri
 		}
 	}
 
-	ss, err := k8sclient.ListSecrets(namespace)
+	ss, err := k8sclient.ListSecrets(ctx, namespace)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to get current secret. name=%s", name)
 	}
@@ -107,7 +110,7 @@ func runSet(k8sclient client.Client, namespace string, args []string, out io.Wri
 	var s *v1.Secret
 
 	if exists {
-		s, err = k8sclient.GetSecret(namespace, name)
+		s, err = k8sclient.GetSecret(ctx, namespace, name)
 		if err != nil {
 			return errors.Wrapf(err, "Failed to get current secret. name=%s", name)
 		}
@@ -120,7 +123,7 @@ func runSet(k8sclient client.Client, namespace string, args []string, out io.Wri
 			}
 		}
 
-		_, err = k8sclient.UpdateSecret(namespace, s)
+		_, err = k8sclient.UpdateSecret(ctx, namespace, s)
 		if err != nil {
 			return errors.Wrapf(err, "Failed to update secret. name=%s", name)
 		}
@@ -130,7 +133,7 @@ func runSet(k8sclient client.Client, namespace string, args []string, out io.Wri
 		}
 		s.SetName(name)
 
-		_, err = k8sclient.CreateSecret(namespace, s)
+		_, err = k8sclient.CreateSecret(ctx, namespace, s)
 		if err != nil {
 			return errors.Wrapf(err, "Failed to create secret. name=%s", name)
 		}

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"strings"
 	"testing"
@@ -77,7 +78,7 @@ rails-env="production"`,
 			in := strings.NewReader(tc.input)
 			var out bytes.Buffer
 
-			err := runLoad(k8sclient, namespace, tc.args, in, &out)
+			err := runLoad(context.Background(), k8sclient, namespace, tc.args, in, &out)
 
 			if tc.wantErr != nil {
 				if err == nil {

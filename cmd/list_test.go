@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"testing"
 
@@ -131,7 +132,7 @@ rails	Opaque	rails-env	"production"
 
 			var out bytes.Buffer
 
-			err := runList(k8sclient, namespace, tc.args, &out)
+			err := runList(context.Background(), k8sclient, namespace, tc.args, &out)
 
 			if tc.wantErr != nil {
 				if err == nil {

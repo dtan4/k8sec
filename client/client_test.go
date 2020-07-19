@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"reflect"
 	"testing"
 
@@ -39,7 +40,9 @@ func TestCreateSecret(t *testing.T) {
 				clientset: clientset,
 			}
 
-			s, err := client.CreateSecret(tc.namespace, secret)
+			ctx := context.Background()
+
+			s, err := client.CreateSecret(ctx, tc.namespace, secret)
 			if err != nil {
 				t.Errorf("want no error, got %q", err)
 			}
@@ -48,7 +51,7 @@ func TestCreateSecret(t *testing.T) {
 				t.Errorf("secret name want %q, got %q", s.Name, secret.Name)
 			}
 
-			if _, err := clientset.CoreV1().Secrets(tc.namespace).Get(tc.name, metav1.GetOptions{}); err != nil {
+			if _, err := clientset.CoreV1().Secrets(tc.namespace).Get(ctx, tc.name, metav1.GetOptions{}); err != nil {
 				t.Errorf("secret %s not found, error: %q", tc.name, err)
 			}
 		})
@@ -86,7 +89,7 @@ func TestGetSecret(t *testing.T) {
 				clientset: clientset,
 			}
 
-			s, err := client.GetSecret(tc.namespace, tc.name)
+			s, err := client.GetSecret(context.Background(), tc.namespace, tc.name)
 			if err != nil {
 				t.Errorf("want no error, got %q", err)
 			}
@@ -136,7 +139,7 @@ func TestListSecrets(t *testing.T) {
 				clientset: clientset,
 			}
 
-			ss, err := client.ListSecrets(tc.namespace)
+			ss, err := client.ListSecrets(context.Background(), tc.namespace)
 			if err != nil {
 				t.Errorf("want no error, got %q", err)
 			}
@@ -185,12 +188,14 @@ func TestUpdateSecret(t *testing.T) {
 				clientset: clientset,
 			}
 
-			_, err := client.UpdateSecret(tc.namespace, tc.newSecret)
+			ctx := context.Background()
+
+			_, err := client.UpdateSecret(ctx, tc.namespace, tc.newSecret)
 			if err != nil {
 				t.Errorf("want no error, got %q", err)
 			}
 
-			s, err := clientset.CoreV1().Secrets(tc.namespace).Get(tc.oldSecret.Name, metav1.GetOptions{})
+			s, err := clientset.CoreV1().Secrets(tc.namespace).Get(ctx, tc.oldSecret.Name, metav1.GetOptions{})
 			if err != nil {
 				t.Errorf("secret %q not found, error: %q", tc.oldSecret.Name, err)
 			}
