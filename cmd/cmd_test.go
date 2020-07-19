@@ -4,7 +4,6 @@ import v1 "k8s.io/api/core/v1"
 
 type fakeClient struct {
 	defaultNamespace     string
-	createSecretResponse *v1.Secret
 	getSecretResponse    *v1.Secret
 	listSecretsResponse  *v1.SecretList
 	updateSecretResponse *v1.Secret
@@ -16,7 +15,7 @@ func (c *fakeClient) DefaultNamespace() string {
 }
 
 func (c *fakeClient) CreateSecret(namespace string, secret *v1.Secret) (*v1.Secret, error) {
-	return c.createSecretResponse, c.err
+	return secret, c.err
 }
 
 func (c *fakeClient) GetSecret(namespace, name string) (*v1.Secret, error) {
