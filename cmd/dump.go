@@ -3,6 +3,7 @@ package cmd
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"sort"
 	"strconv"
@@ -38,27 +39,29 @@ $ k8sec dump -f .env --noquotes rails
 $ cat .env
 database-url=postgres://example.com:5432/dbname
 `,
-	RunE: doDump,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if len(args) > 1 {
+			return errors.New("Too many arguments.")
+		}
+
+		k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
+		if err != nil {
+			return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
+		}
+
+		var namespace string
+
+		if rootOpts.namespace != "" {
+			namespace = rootOpts.namespace
+		} else {
+			namespace = k8sclient.DefaultNamespace()
+		}
+
+		return runDump(k8sclient, namespace, args, os.Stdout)
+	},
 }
 
-func doDump(cmd *cobra.Command, args []string) error {
-	if len(args) > 1 {
-		return errors.New("Too many arguments.")
-	}
-
-	k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
-	if err != nil {
-		return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
-	}
-
-	var namespace string
-
-	if rootOpts.namespace != "" {
-		namespace = rootOpts.namespace
-	} else {
-		namespace = k8sclient.DefaultNamespace()
-	}
-
+func runDump(k8sclient client.Client, namespace string, args []string, out io.Writer) error {
 	var lines []string
 
 	if len(args) == 1 {
@@ -112,7 +115,7 @@ func doDump(cmd *cobra.Command, args []string) error {
 		w.Flush()
 	} else {
 		for _, line := range lines {
-			fmt.Println(line)
+			fmt.Fprintln(out, line)
 		}
 	}
 
