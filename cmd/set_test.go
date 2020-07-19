@@ -12,6 +12,7 @@ import (
 func TestRunSet(t *testing.T) {
 	testcases := map[string]struct {
 		args    []string
+		secret  *v1.Secret
 		secrets *v1.SecretList
 		err     error
 		wantOut string
@@ -25,7 +26,7 @@ func TestRunSet(t *testing.T) {
 			secrets: &v1.SecretList{
 				Items: []v1.Secret{},
 			},
-			wantOut: "rails",
+			wantOut: "rails\n",
 			wantErr: nil,
 		},
 
@@ -33,6 +34,14 @@ func TestRunSet(t *testing.T) {
 			args: []string{
 				"rails",
 				"database-url=postgres://example.com:5432/dbname",
+			},
+			secret: &v1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "rails",
+				},
+				Data: map[string][]byte{
+					"foo": []byte("bar"),
+				},
 			},
 			secrets: &v1.SecretList{
 				Items: []v1.Secret{
@@ -46,7 +55,7 @@ func TestRunSet(t *testing.T) {
 					},
 				},
 			},
-			wantOut: "rails",
+			wantOut: "rails\n",
 			wantErr: nil,
 		},
 
@@ -59,7 +68,7 @@ func TestRunSet(t *testing.T) {
 			secrets: &v1.SecretList{
 				Items: []v1.Secret{},
 			},
-			wantOut: "rails",
+			wantOut: "rails\n",
 			wantErr: nil,
 		},
 
@@ -80,10 +89,12 @@ func TestRunSet(t *testing.T) {
 	namespace := "test"
 
 	for name, tc := range testcases {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
 			k8sclient := &fakeClient{
+				getSecretResponse:   tc.secret,
 				listSecretsResponse: tc.secrets,
 				err:                 tc.err,
 			}
