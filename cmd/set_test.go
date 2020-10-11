@@ -102,7 +102,7 @@ func TestRunSet(t *testing.T) {
 
 			var out bytes.Buffer
 
-			err := runSet(context.Background(), k8sclient, namespace, tc.args, &out)
+			err := runSet(context.Background(), k8sclient, namespace, tc.args, &out, &setOpts{})
 
 			if tc.wantErr != nil {
 				if err == nil {

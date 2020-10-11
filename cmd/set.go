@@ -13,11 +13,13 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-var setOpts = struct {
+type setOpts struct {
 	base64encoded bool
-}{}
+}
 
 func newSetCmd(out io.Writer) *cobra.Command {
+	opts := setOpts{}
+
 	setCmd := &cobra.Command{
 		Use:   "set NAME KEY1=VALUE1 [KEY2=VALUE2 ...]",
 		Short: "Set secrets",
@@ -62,16 +64,16 @@ rails   Opaque  foo             "dtan4"
 				namespace = k8sclient.DefaultNamespace()
 			}
 
-			return runSet(ctx, k8sclient, namespace, args, out)
+			return runSet(ctx, k8sclient, namespace, args, out, &opts)
 		},
 	}
 
-	setCmd.Flags().BoolVar(&setOpts.base64encoded, "base64", false, "Decode the given value as base64-encoded string")
+	setCmd.Flags().BoolVar(&opts.base64encoded, "base64", false, "Decode the given value as base64-encoded string")
 
 	return setCmd
 }
 
-func runSet(ctx context.Context, k8sclient client.Client, namespace string, args []string, out io.Writer) error {
+func runSet(ctx context.Context, k8sclient client.Client, namespace string, args []string, out io.Writer, opts *setOpts) error {
 	name := args[0]
 
 	data := map[string][]byte{}
@@ -85,7 +87,7 @@ func runSet(ctx context.Context, k8sclient client.Client, namespace string, args
 
 		k, v := ary[0], ary[1]
 
-		if setOpts.base64encoded {
+		if opts.base64encoded {
 			_v, err := base64.StdEncoding.DecodeString(v)
 			if err != nil {
 				return errors.Wrapf(err, "Failed to decode value as base64-encoded string. value=%q", v)
