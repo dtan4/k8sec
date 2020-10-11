@@ -17,6 +17,7 @@ func TestRunDump(t *testing.T) {
 	testcases := map[string]struct {
 		args     []string
 		filename string
+		noquotes bool
 		secret   *v1.Secret
 		secrets  *v1.SecretList
 		err      error
@@ -26,6 +27,7 @@ func TestRunDump(t *testing.T) {
 		"no secret arg": {
 			args:     []string{},
 			filename: "",
+			noquotes: false,
 			secrets: &v1.SecretList{
 				Items: []v1.Secret{
 					{
@@ -64,6 +66,7 @@ token="thisistoken"
 		"no secret arg and error": {
 			args:     []string{},
 			filename: "",
+			noquotes: false,
 			err:      fmt.Errorf("cannot retrieve secret rails"),
 			wantErr:  fmt.Errorf("Failed to list secret.: cannot retrieve secret rails"),
 		},
@@ -71,6 +74,7 @@ token="thisistoken"
 		"one secret arg": {
 			args:     []string{"rails"},
 			filename: "",
+			noquotes: false,
 			secret: &v1.Secret{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "rails",
@@ -88,11 +92,49 @@ rails-env="production"
 			wantErr: nil,
 		},
 
-		// TODO: Add testcase for --noquotes once I move noquotes to local variable
+		"dump with no quotes": {
+			args:     []string{},
+			filename: "",
+			noquotes: true,
+			secrets: &v1.SecretList{
+				Items: []v1.Secret{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "default-token-12345",
+						},
+						Data: map[string][]byte{
+							"ca.crt":    []byte("thisiscrt"),
+							"namespace": []byte("test"),
+							"token":     []byte("thisistoken"),
+						},
+						Type: v1.SecretTypeServiceAccountToken,
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "rails",
+						},
+						Data: map[string][]byte{
+							"rails-env":    []byte("production"),
+							"database-url": []byte("postgres://example.com:5432/dbname"),
+						},
+						Type: v1.SecretTypeOpaque,
+					},
+				},
+			},
+			err: nil,
+			wantOut: `ca.crt=thisiscrt
+database-url=postgres://example.com:5432/dbname
+namespace=test
+rails-env=production
+token=thisistoken
+`,
+			wantErr: nil,
+		},
 
 		"one secret and error": {
 			args:     []string{"rails"},
 			filename: "",
+			noquotes: false,
 			err:      fmt.Errorf("cannot retrieve secret rails"),
 			wantErr:  fmt.Errorf("Failed to get secret. name=rails: cannot retrieve secret rails"),
 		},
@@ -113,7 +155,10 @@ rails-env="production"
 
 			var out bytes.Buffer
 
-			opts := dumpOpts{}
+			opts := dumpOpts{
+				filename: tc.filename,
+				noquotes: tc.noquotes,
+			}
 
 			err := runDump(context.Background(), k8sclient, namespace, tc.args, &out, &opts)
 
@@ -144,6 +189,7 @@ func TestRunDump_dumpToFile(t *testing.T) {
 	testcases := map[string]struct {
 		args     []string
 		filename string
+		noquotes bool
 		secret   *v1.Secret
 		secrets  *v1.SecretList
 		wantOut  string
@@ -152,6 +198,7 @@ func TestRunDump_dumpToFile(t *testing.T) {
 		"dump to file": {
 			args:     []string{},
 			filename: ".env",
+			noquotes: false,
 			secrets: &v1.SecretList{
 				Items: []v1.Secret{
 					{
@@ -205,6 +252,7 @@ token="thisistoken"
 
 			opts := dumpOpts{
 				filename: filename,
+				noquotes: tc.noquotes,
 			}
 
 			err := runDump(context.Background(), k8sclient, namespace, tc.args, &out, &opts)
