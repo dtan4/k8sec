@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"testing"
 
 	v1 "k8s.io/api/core/v1"
@@ -12,17 +15,19 @@ import (
 
 func TestRunDump(t *testing.T) {
 	testcases := map[string]struct {
-		base64encode bool
-		args         []string
-		secret       *v1.Secret
-		secrets      *v1.SecretList
-		err          error
-		wantOut      string
-		wantErr      error
+		args     []string
+		filename string
+		noquotes bool
+		secret   *v1.Secret
+		secrets  *v1.SecretList
+		err      error
+		wantOut  string
+		wantErr  error
 	}{
 		"no secret arg": {
-			base64encode: false,
-			args:         []string{},
+			args:     []string{},
+			filename: "",
+			noquotes: false,
 			secrets: &v1.SecretList{
 				Items: []v1.Secret{
 					{
@@ -59,14 +64,17 @@ token="thisistoken"
 		},
 
 		"no secret arg and error": {
-			args:    []string{},
-			err:     fmt.Errorf("cannot retrieve secret rails"),
-			wantErr: fmt.Errorf("Failed to list secret.: cannot retrieve secret rails"),
+			args:     []string{},
+			filename: "",
+			noquotes: false,
+			err:      fmt.Errorf("cannot retrieve secret rails"),
+			wantErr:  fmt.Errorf("Failed to list secret.: cannot retrieve secret rails"),
 		},
 
 		"one secret arg": {
-			base64encode: false,
-			args:         []string{"rails"},
+			args:     []string{"rails"},
+			filename: "",
+			noquotes: false,
 			secret: &v1.Secret{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "rails",
@@ -84,14 +92,51 @@ rails-env="production"
 			wantErr: nil,
 		},
 
-		// TODO: Add testcase for --filename once I move filename to local variable
-
-		// TODO: Add testcase for --noquotes once I move noquotes to local variable
+		"dump with no quotes": {
+			args:     []string{},
+			filename: "",
+			noquotes: true,
+			secrets: &v1.SecretList{
+				Items: []v1.Secret{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "default-token-12345",
+						},
+						Data: map[string][]byte{
+							"ca.crt":    []byte("thisiscrt"),
+							"namespace": []byte("test"),
+							"token":     []byte("thisistoken"),
+						},
+						Type: v1.SecretTypeServiceAccountToken,
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "rails",
+						},
+						Data: map[string][]byte{
+							"rails-env":    []byte("production"),
+							"database-url": []byte("postgres://example.com:5432/dbname"),
+						},
+						Type: v1.SecretTypeOpaque,
+					},
+				},
+			},
+			err: nil,
+			wantOut: `ca.crt=thisiscrt
+database-url=postgres://example.com:5432/dbname
+namespace=test
+rails-env=production
+token=thisistoken
+`,
+			wantErr: nil,
+		},
 
 		"one secret and error": {
-			args:    []string{"rails"},
-			err:     fmt.Errorf("cannot retrieve secret rails"),
-			wantErr: fmt.Errorf("Failed to get secret. name=rails: cannot retrieve secret rails"),
+			args:     []string{"rails"},
+			filename: "",
+			noquotes: false,
+			err:      fmt.Errorf("cannot retrieve secret rails"),
+			wantErr:  fmt.Errorf("Failed to get secret. name=rails: cannot retrieve secret rails"),
 		},
 	}
 
@@ -110,7 +155,12 @@ rails-env="production"
 
 			var out bytes.Buffer
 
-			err := runDump(context.Background(), k8sclient, namespace, tc.args, &out)
+			opts := dumpOpts{
+				filename: tc.filename,
+				noquotes: tc.noquotes,
+			}
+
+			err := runDump(context.Background(), k8sclient, namespace, tc.args, &out, &opts)
 
 			if tc.wantErr != nil {
 				if err == nil {
@@ -130,6 +180,109 @@ rails-env="production"
 					t.Logf("got:\n%s", out.String())
 					t.Fatalf("want %q, got %q", tc.wantOut, out.String())
 				}
+			}
+		})
+	}
+}
+
+func TestRunDump_dumpToFile(t *testing.T) {
+	testcases := map[string]struct {
+		args     []string
+		filename string
+		noquotes bool
+		secret   *v1.Secret
+		secrets  *v1.SecretList
+		wantOut  string
+		wantBody string
+	}{
+		"dump to file": {
+			args:     []string{},
+			filename: ".env",
+			noquotes: false,
+			secrets: &v1.SecretList{
+				Items: []v1.Secret{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "default-token-12345",
+						},
+						Data: map[string][]byte{
+							"ca.crt":    []byte("thisiscrt"),
+							"namespace": []byte("test"),
+							"token":     []byte("thisistoken"),
+						},
+						Type: v1.SecretTypeServiceAccountToken,
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "rails",
+						},
+						Data: map[string][]byte{
+							"rails-env":    []byte("production"),
+							"database-url": []byte("postgres://example.com:5432/dbname"),
+						},
+						Type: v1.SecretTypeOpaque,
+					},
+				},
+			},
+			wantOut: "",
+			wantBody: `ca.crt="thisiscrt"
+database-url="postgres://example.com:5432/dbname"
+namespace="test"
+rails-env="production"
+token="thisistoken"
+`,
+		},
+	}
+
+	namespace := "test"
+
+	for name, tc := range testcases {
+		tc := tc
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			k8sclient := &fakeClient{
+				getSecretResponse:   tc.secret,
+				listSecretsResponse: tc.secrets,
+			}
+
+			var out bytes.Buffer
+
+			filename := filepath.Join(t.TempDir(), tc.filename)
+
+			opts := dumpOpts{
+				filename: filename,
+				noquotes: tc.noquotes,
+			}
+
+			err := runDump(context.Background(), k8sclient, namespace, tc.args, &out, &opts)
+
+			if err != nil {
+				t.Fatalf("want no error, got %q", err.Error())
+			}
+
+			if out.String() != tc.wantOut {
+				t.Logf("want:\n%s", tc.wantOut)
+				t.Logf("got:\n%s", out.String())
+				t.Fatalf("want %q, got %q", tc.wantOut, out.String())
+			}
+
+			if _, err := os.Stat(filename); err != nil {
+				t.Fatalf("want file %q but not found", filename)
+			}
+
+			f, err := os.Open(filename)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			b, err := ioutil.ReadAll(f)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if string(b) != tc.wantBody {
+				t.Fatalf("want %q, got %q", tc.wantBody, string(b))
 			}
 		})
 	}
