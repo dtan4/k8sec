@@ -62,7 +62,7 @@ database-url=postgres://example.com:5432/dbname
 				namespace = k8sclient.DefaultNamespace()
 			}
 
-			return runDump(ctx, k8sclient, namespace, args, os.Stdout, &opts)
+			return runDump(ctx, k8sclient, namespace, args, out, &opts)
 		},
 	}
 
