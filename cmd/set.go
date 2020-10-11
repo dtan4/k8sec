@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
-	"os"
 	"strings"
 
 	"github.com/dtan4/k8sec/client"
@@ -18,11 +17,11 @@ var setOpts = struct {
 	base64encoded bool
 }{}
 
-// setCmd represents the set command
-var setCmd = &cobra.Command{
-	Use:   "set NAME KEY1=VALUE1 [KEY2=VALUE2 ...]",
-	Short: "Set secrets",
-	Long: `Set secrets
+func newSetCmd(out io.Writer) *cobra.Command {
+	setCmd := &cobra.Command{
+		Use:   "set NAME KEY1=VALUE1 [KEY2=VALUE2 ...]",
+		Short: "Set secrets",
+		Long: `Set secrets
 
 Set value as it is:
 
@@ -43,28 +42,33 @@ NAME    TYPE    KEY             VALUE
 rails   Opaque  database-url    "postgres://example.com:5432/dbname"
 rails   Opaque  foo             "dtan4"
 `,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		if len(args) < 2 {
-			return errors.New("Too few arguments.")
-		}
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) < 2 {
+				return errors.New("Too few arguments.")
+			}
 
-		ctx := context.Background()
+			ctx := context.Background()
 
-		k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
-		if err != nil {
-			return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
-		}
+			k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
+			if err != nil {
+				return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
+			}
 
-		var namespace string
+			var namespace string
 
-		if rootOpts.namespace != "" {
-			namespace = rootOpts.namespace
-		} else {
-			namespace = k8sclient.DefaultNamespace()
-		}
+			if rootOpts.namespace != "" {
+				namespace = rootOpts.namespace
+			} else {
+				namespace = k8sclient.DefaultNamespace()
+			}
 
-		return runSet(ctx, k8sclient, namespace, args, os.Stdout)
-	},
+			return runSet(ctx, k8sclient, namespace, args, out)
+		},
+	}
+
+	setCmd.Flags().BoolVar(&setOpts.base64encoded, "base64", false, "Decode the given value as base64-encoded string")
+
+	return setCmd
 }
 
 func runSet(ctx context.Context, k8sclient client.Client, namespace string, args []string, out io.Writer) error {
@@ -142,8 +146,4 @@ func runSet(ctx context.Context, k8sclient client.Client, namespace string, args
 	fmt.Fprintln(out, s.Name)
 
 	return nil
-}
-
-func init() {
-	setCmd.Flags().BoolVar(&setOpts.base64encoded, "base64", false, "Decode the given value as base64-encoded string")
 }
