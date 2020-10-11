@@ -110,7 +110,9 @@ rails-env="production"
 
 			var out bytes.Buffer
 
-			err := runDump(context.Background(), k8sclient, namespace, tc.args, &out)
+			opts := dumpOpts{}
+
+			err := runDump(context.Background(), k8sclient, namespace, tc.args, &out, &opts)
 
 			if tc.wantErr != nil {
 				if err == nil {

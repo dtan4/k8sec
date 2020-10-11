@@ -14,12 +14,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var dumpOpts = struct {
+type dumpOpts struct {
 	filename string
 	noquotes bool
-}{}
+}
 
 func newDumpCmd(out io.Writer) *cobra.Command {
+	opts := dumpOpts{}
+
 	dumpCmd := &cobra.Command{
 		Use:   "dump [NAME]",
 		Short: "Dump secrets as dotenv (key=value) format",
@@ -60,17 +62,17 @@ database-url=postgres://example.com:5432/dbname
 				namespace = k8sclient.DefaultNamespace()
 			}
 
-			return runDump(ctx, k8sclient, namespace, args, os.Stdout)
+			return runDump(ctx, k8sclient, namespace, args, os.Stdout, &opts)
 		},
 	}
 
-	dumpCmd.Flags().StringVarP(&dumpOpts.filename, "filename", "f", "", "File to dump")
-	dumpCmd.Flags().BoolVar(&dumpOpts.noquotes, "noquotes", false, "Dump without quotes")
+	dumpCmd.Flags().StringVarP(&opts.filename, "filename", "f", "", "File to dump")
+	dumpCmd.Flags().BoolVar(&opts.noquotes, "noquotes", false, "Dump without quotes")
 
 	return dumpCmd
 }
 
-func runDump(ctx context.Context, k8sclient client.Client, namespace string, args []string, out io.Writer) error {
+func runDump(ctx context.Context, k8sclient client.Client, namespace string, args []string, out io.Writer, opts *dumpOpts) error {
 	var lines []string
 
 	if len(args) == 1 {
@@ -81,7 +83,7 @@ func runDump(ctx context.Context, k8sclient client.Client, namespace string, arg
 
 		for key, value := range secret.Data {
 			line := string(value)
-			if !dumpOpts.noquotes {
+			if !opts.noquotes {
 				line = strconv.Quote(line)
 			}
 			lines = append(lines, key+"="+line)
@@ -95,7 +97,7 @@ func runDump(ctx context.Context, k8sclient client.Client, namespace string, arg
 		for _, secret := range secrets.Items {
 			for key, value := range secret.Data {
 				v := string(value)
-				if !dumpOpts.noquotes {
+				if !opts.noquotes {
 					v = strconv.Quote(v)
 				}
 				lines = append(lines, key+"="+v)
@@ -105,10 +107,10 @@ func runDump(ctx context.Context, k8sclient client.Client, namespace string, arg
 
 	sort.Strings(lines)
 
-	if dumpOpts.filename != "" {
-		f, err := os.Create(dumpOpts.filename)
+	if opts.filename != "" {
+		f, err := os.Create(opts.filename)
 		if err != nil {
-			return errors.Wrapf(err, "Failed to open file. filename=%s", dumpOpts.filename)
+			return errors.Wrapf(err, "Failed to open file. filename=%s", opts.filename)
 		}
 		defer f.Close()
 
@@ -117,7 +119,7 @@ func runDump(ctx context.Context, k8sclient client.Client, namespace string, arg
 		for _, line := range lines {
 			_, err := w.WriteString(line + "\n")
 			if err != nil {
-				return errors.Wrapf(err, "Failed to write to file. filename=%s", dumpOpts.filename)
+				return errors.Wrapf(err, "Failed to write to file. filename=%s", opts.filename)
 			}
 		}
 
