@@ -40,7 +40,7 @@ func newRootCmd(in io.Reader, out io.Writer, args []string) *cobra.Command {
 	cmd.AddCommand(newLoadCmd(in, out))
 	cmd.AddCommand(newSetCmd(out))
 	cmd.AddCommand(newUnsetCmd(out))
-	cmd.AddCommand(versionCmd)
+	cmd.AddCommand(newVersionCmd(out))
 
 	return cmd
 }
