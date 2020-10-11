@@ -145,7 +145,5 @@ func runSet(ctx context.Context, k8sclient client.Client, namespace string, args
 }
 
 func init() {
-	RootCmd.AddCommand(setCmd)
-
 	setCmd.Flags().BoolVar(&setOpts.base64encoded, "base64", false, "Decode the given value as base64-encoded string")
 }

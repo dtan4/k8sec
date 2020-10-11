@@ -126,8 +126,6 @@ func runDump(ctx context.Context, k8sclient client.Client, namespace string, arg
 }
 
 func init() {
-	RootCmd.AddCommand(dumpCmd)
-
 	dumpCmd.Flags().StringVarP(&dumpOpts.filename, "filename", "f", "", "File to dump")
 	dumpCmd.Flags().BoolVar(&dumpOpts.noquotes, "noquotes", false, "Dump without quotes")
 }
