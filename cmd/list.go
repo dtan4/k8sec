@@ -15,11 +15,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var listOpts = struct {
+type listOpts struct {
 	base64encode bool
-}{}
+}
 
 func newListCmd(out io.Writer) *cobra.Command {
+	opts := listOpts{}
+
 	listCmd := &cobra.Command{
 		Use:   "list",
 		Short: "List secrets",
@@ -55,11 +57,11 @@ rails   Opaque  database-url    cG9zdGdyZXM6Ly9leGFtcGxlLmNvbTo1NDMyL2RibmFtZQ==
 				namespace = k8sclient.DefaultNamespace()
 			}
 
-			return runList(ctx, k8sclient, namespace, args, out)
+			return runList(ctx, k8sclient, namespace, args, out, &opts)
 		},
 	}
 
-	listCmd.Flags().BoolVar(&listOpts.base64encode, "base64", false, "Show values as base64-encoded string")
+	listCmd.Flags().BoolVar(&opts.base64encode, "base64", false, "Show values as base64-encoded string")
 
 	return listCmd
 }
@@ -71,7 +73,7 @@ type Secret struct {
 	Value string
 }
 
-func runList(ctx context.Context, k8sclient client.Client, namespace string, args []string, out io.Writer) error {
+func runList(ctx context.Context, k8sclient client.Client, namespace string, args []string, out io.Writer, opts *listOpts) error {
 	w := new(tabwriter.Writer)
 	w.Init(out, 0, 8, 0, '\t', 0)
 	fmt.Fprintln(w, strings.Join([]string{"NAME", "TYPE", "KEY", "VALUE"}, "\t"))
@@ -87,7 +89,7 @@ func runList(ctx context.Context, k8sclient client.Client, namespace string, arg
 		}
 
 		for key, value := range secret.Data {
-			if listOpts.base64encode {
+			if opts.base64encode {
 				v = base64.StdEncoding.EncodeToString(value)
 			} else {
 				v = strconv.Quote(string(value))
@@ -117,7 +119,7 @@ func runList(ctx context.Context, k8sclient client.Client, namespace string, arg
 			}{}
 
 			for key, value := range secret.Data {
-				if listOpts.base64encode {
+				if opts.base64encode {
 					v = base64.StdEncoding.EncodeToString(value)
 				} else {
 					v = strconv.Quote(string(value))

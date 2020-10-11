@@ -122,8 +122,6 @@ rails	Opaque	rails-env	"production"
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			listOpts.base64encode = tc.base64encode
-
 			k8sclient := &fakeClient{
 				getSecretResponse:   tc.secret,
 				listSecretsResponse: tc.secrets,
@@ -132,7 +130,10 @@ rails	Opaque	rails-env	"production"
 
 			var out bytes.Buffer
 
-			err := runList(context.Background(), k8sclient, namespace, tc.args, &out)
+			opts := listOpts{
+				base64encode: tc.base64encode,
+			}
+			err := runList(context.Background(), k8sclient, namespace, tc.args, &out, &opts)
 
 			if tc.wantErr != nil {
 				if err == nil {
