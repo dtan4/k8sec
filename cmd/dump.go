@@ -19,11 +19,11 @@ var dumpOpts = struct {
 	noquotes bool
 }{}
 
-// dumpCmd represents the dump command
-var dumpCmd = &cobra.Command{
-	Use:   "dump [NAME]",
-	Short: "Dump secrets as dotenv (key=value) format",
-	Long: `Dump secrets as dotenv (key=value) format
+func newDumpCmd(out io.Writer) *cobra.Command {
+	dumpCmd := &cobra.Command{
+		Use:   "dump [NAME]",
+		Short: "Dump secrets as dotenv (key=value) format",
+		Long: `Dump secrets as dotenv (key=value) format
 
 $ k8sec dump rails
 database-url="postgres://example.com:5432/dbname"
@@ -40,28 +40,34 @@ $ k8sec dump -f .env --noquotes rails
 $ cat .env
 database-url=postgres://example.com:5432/dbname
 `,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		if len(args) > 1 {
-			return errors.New("Too many arguments.")
-		}
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) > 1 {
+				return errors.New("Too many arguments.")
+			}
 
-		ctx := context.Background()
+			ctx := context.Background()
 
-		k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
-		if err != nil {
-			return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
-		}
+			k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
+			if err != nil {
+				return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
+			}
 
-		var namespace string
+			var namespace string
 
-		if rootOpts.namespace != "" {
-			namespace = rootOpts.namespace
-		} else {
-			namespace = k8sclient.DefaultNamespace()
-		}
+			if rootOpts.namespace != "" {
+				namespace = rootOpts.namespace
+			} else {
+				namespace = k8sclient.DefaultNamespace()
+			}
 
-		return runDump(ctx, k8sclient, namespace, args, os.Stdout)
-	},
+			return runDump(ctx, k8sclient, namespace, args, os.Stdout)
+		},
+	}
+
+	dumpCmd.Flags().StringVarP(&dumpOpts.filename, "filename", "f", "", "File to dump")
+	dumpCmd.Flags().BoolVar(&dumpOpts.noquotes, "noquotes", false, "Dump without quotes")
+
+	return dumpCmd
 }
 
 func runDump(ctx context.Context, k8sclient client.Client, namespace string, args []string, out io.Writer) error {
@@ -123,9 +129,4 @@ func runDump(ctx context.Context, k8sclient client.Client, namespace string, arg
 	}
 
 	return nil
-}
-
-func init() {
-	dumpCmd.Flags().StringVarP(&dumpOpts.filename, "filename", "f", "", "File to dump")
-	dumpCmd.Flags().BoolVar(&dumpOpts.noquotes, "noquotes", false, "Dump without quotes")
 }
