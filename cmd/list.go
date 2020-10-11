@@ -153,7 +153,5 @@ func runList(ctx context.Context, k8sclient client.Client, namespace string, arg
 }
 
 func init() {
-	RootCmd.AddCommand(listCmd)
-
 	listCmd.Flags().BoolVar(&listOpts.base64encode, "base64", false, "Show values as base64-encoded string")
 }

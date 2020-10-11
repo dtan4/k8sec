@@ -67,5 +67,4 @@ func runUnset(ctx context.Context, k8sclient client.Client, namespace string, ar
 }
 
 func init() {
-	RootCmd.AddCommand(unsetCmd)
 }

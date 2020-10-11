@@ -113,7 +113,5 @@ func runLoad(ctx context.Context, k8sclient client.Client, namespace string, arg
 }
 
 func init() {
-	RootCmd.AddCommand(loadCmd)
-
 	loadCmd.Flags().StringVarP(&loadOpts.filename, "filename", "f", "", "File to load")
 }
