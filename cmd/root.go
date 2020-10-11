@@ -33,8 +33,6 @@ func newRootCmd(in io.Reader, out io.Writer, args []string) *cobra.Command {
 	flags.StringVar(&rootOpts.kubeconfig, "kubeconfig", "", "Path of kubeconfig")
 	flags.StringVarP(&rootOpts.namespace, "namespace", "n", "", "Kubernetes namespace")
 
-	flags.Parse(args)
-
 	cmd.AddCommand(newDumpCmd(out))
 	cmd.AddCommand(newListCmd(out))
 	cmd.AddCommand(newLoadCmd(in, out))
