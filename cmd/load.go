@@ -13,11 +13,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var loadOpts = struct {
+type loadOpts struct {
 	filename string
-}{}
+}
 
 func newLoadCmd(out io.Writer) *cobra.Command {
+	opts := loadOpts{}
+
 	loadCmd := &cobra.Command{
 		Use:   "load NAME",
 		Short: "Load secrets from dotenv (key=value) format text",
@@ -51,16 +53,16 @@ $ cat .env | k8sec load rails
 				namespace = k8sclient.DefaultNamespace()
 			}
 
-			return runLoad(ctx, k8sclient, namespace, args, os.Stdin, os.Stdout)
+			return runLoad(ctx, k8sclient, namespace, args, os.Stdin, os.Stdout, &opts)
 		},
 	}
 
-	loadCmd.Flags().StringVarP(&loadOpts.filename, "filename", "f", "", "File to load")
+	loadCmd.Flags().StringVarP(&opts.filename, "filename", "f", "", "File to load")
 
 	return loadCmd
 }
 
-func runLoad(ctx context.Context, k8sclient client.Client, namespace string, args []string, in io.Reader, out io.Writer) error {
+func runLoad(ctx context.Context, k8sclient client.Client, namespace string, args []string, in io.Reader, out io.Writer, opts *loadOpts) error {
 	if len(args) != 1 {
 		return errors.New("Variable name must be specified.")
 	}
@@ -69,10 +71,10 @@ func runLoad(ctx context.Context, k8sclient client.Client, namespace string, arg
 	var sc *bufio.Scanner
 	data := map[string][]byte{}
 
-	if loadOpts.filename != "" {
-		f, err := os.Open(loadOpts.filename)
+	if opts.filename != "" {
+		f, err := os.Open(opts.filename)
 		if err != nil {
-			return errors.Wrapf(err, "Failed to open file. filename=%s", loadOpts.filename)
+			return errors.Wrapf(err, "Failed to open file. filename=%s", opts.filename)
 		}
 		defer f.Close()
 
