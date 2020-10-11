@@ -17,11 +17,11 @@ var loadOpts = struct {
 	filename string
 }{}
 
-// loadCmd represents the load command
-var loadCmd = &cobra.Command{
-	Use:   "load NAME",
-	Short: "Load secrets from dotenv (key=value) format text",
-	Long: `Load secrets from dotenv (key=value) format text
+func newLoadCmd(out io.Writer) *cobra.Command {
+	loadCmd := &cobra.Command{
+		Use:   "load NAME",
+		Short: "Load secrets from dotenv (key=value) format text",
+		Long: `Load secrets from dotenv (key=value) format text
 
 $ cat .env
 database-url="postgres://example.com:5432/dbname"
@@ -31,28 +31,33 @@ Load from stdin:
 
 $ cat .env | k8sec load rails
 `,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		if len(args) != 1 {
-			return errors.New("Variable name must be specified.")
-		}
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) != 1 {
+				return errors.New("Variable name must be specified.")
+			}
 
-		ctx := context.Background()
+			ctx := context.Background()
 
-		k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
-		if err != nil {
-			return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
-		}
+			k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
+			if err != nil {
+				return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
+			}
 
-		var namespace string
+			var namespace string
 
-		if rootOpts.namespace != "" {
-			namespace = rootOpts.namespace
-		} else {
-			namespace = k8sclient.DefaultNamespace()
-		}
+			if rootOpts.namespace != "" {
+				namespace = rootOpts.namespace
+			} else {
+				namespace = k8sclient.DefaultNamespace()
+			}
 
-		return runLoad(ctx, k8sclient, namespace, args, os.Stdin, os.Stdout)
-	},
+			return runLoad(ctx, k8sclient, namespace, args, os.Stdin, os.Stdout)
+		},
+	}
+
+	loadCmd.Flags().StringVarP(&loadOpts.filename, "filename", "f", "", "File to load")
+
+	return loadCmd
 }
 
 func runLoad(ctx context.Context, k8sclient client.Client, namespace string, args []string, in io.Reader, out io.Writer) error {
@@ -110,8 +115,4 @@ func runLoad(ctx context.Context, k8sclient client.Client, namespace string, arg
 	}
 
 	return nil
-}
-
-func init() {
-	loadCmd.Flags().StringVarP(&loadOpts.filename, "filename", "f", "", "File to load")
 }
