@@ -36,7 +36,7 @@ func newRootCmd(in io.Reader, out io.Writer, args []string) *cobra.Command {
 	flags.Parse(args)
 
 	cmd.AddCommand(dumpCmd)
-	cmd.AddCommand(listCmd)
+	cmd.AddCommand(newListCmd(out))
 	cmd.AddCommand(newLoadCmd(in, out))
 	cmd.AddCommand(newSetCmd(out))
 	cmd.AddCommand(newUnsetCmd(out))

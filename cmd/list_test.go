@@ -86,27 +86,26 @@ rails	Opaque	rails-env	"production"
 			wantErr: nil,
 		},
 
-		// TODO: Uncomment this once I move base64encode to local variable
-		// 		"one secret arg with --base64 option": {
-		// 			base64encode: true,
-		// 			args:         []string{"rails"},
-		// 			secret: &v1.Secret{
-		// 				ObjectMeta: metav1.ObjectMeta{
-		// 					Name: "rails",
-		// 				},
-		// 				Data: map[string][]byte{
-		// 					"rails-env":    []byte("production"),
-		// 					"database-url": []byte("postgres://example.com:5432/dbname"),
-		// 				},
-		// 				Type: v1.SecretTypeOpaque,
-		// 			},
-		// 			err: nil,
-		// 			wantOut: `NAME	TYPE	KEY		VALUE
-		// rails	Opaque	database-url	cG9zdGdyZXM6Ly9leGFtcGxlLmNvbTo1NDMyL2RibmFtZQ==
-		// rails	Opaque	rails-env	cHJvZHVjdGlvbg==
-		// `,
-		// 			wantErr: nil,
-		// 		},
+		"one secret arg with --base64 option": {
+			base64encode: true,
+			args:         []string{"rails"},
+			secret: &v1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "rails",
+				},
+				Data: map[string][]byte{
+					"rails-env":    []byte("production"),
+					"database-url": []byte("postgres://example.com:5432/dbname"),
+				},
+				Type: v1.SecretTypeOpaque,
+			},
+			err: nil,
+			wantOut: `NAME	TYPE	KEY		VALUE
+rails	Opaque	database-url	cG9zdGdyZXM6Ly9leGFtcGxlLmNvbTo1NDMyL2RibmFtZQ==
+rails	Opaque	rails-env	cHJvZHVjdGlvbg==
+`,
+			wantErr: nil,
+		},
 
 		"one secret and error": {
 			args:    []string{"rails"},
@@ -122,8 +121,6 @@ rails	Opaque	rails-env	"production"
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			listOpts.base64encode = tc.base64encode
-
 			k8sclient := &fakeClient{
 				getSecretResponse:   tc.secret,
 				listSecretsResponse: tc.secrets,
@@ -132,7 +129,10 @@ rails	Opaque	rails-env	"production"
 
 			var out bytes.Buffer
 
-			err := runList(context.Background(), k8sclient, namespace, tc.args, &out)
+			opts := listOpts{
+				base64encode: tc.base64encode,
+			}
+			err := runList(context.Background(), k8sclient, namespace, tc.args, &out, &opts)
 
 			if tc.wantErr != nil {
 				if err == nil {
