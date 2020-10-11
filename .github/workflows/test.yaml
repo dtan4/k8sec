@@ -22,7 +22,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v1
         with:
-          go-version: 1.14
+          go-version: 1.15
       - name: Run tests
         run: make ci-test
       - name: Send test coverage to Codecov
