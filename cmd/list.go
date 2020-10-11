@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
-	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -20,11 +19,11 @@ var listOpts = struct {
 	base64encode bool
 }{}
 
-// listCmd represents the list command
-var listCmd = &cobra.Command{
-	Use:   "list",
-	Short: "List secrets",
-	Long: `List secrets
+func newListCmd(out io.Writer) *cobra.Command {
+	listCmd := &cobra.Command{
+		Use:   "list",
+		Short: "List secrets",
+		Long: `List secrets
 
 $ k8sec list rails
 NAME    TYPE    KEY             VALUE
@@ -36,28 +35,33 @@ $ k8sec list --base64 rails
 NAME    TYPE    KEY             VALUE
 rails   Opaque  database-url    cG9zdGdyZXM6Ly9leGFtcGxlLmNvbTo1NDMyL2RibmFtZQ==
 `,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		if len(args) > 1 {
-			return errors.New("Too many arguments.")
-		}
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) > 1 {
+				return errors.New("Too many arguments.")
+			}
 
-		ctx := context.Background()
+			ctx := context.Background()
 
-		k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
-		if err != nil {
-			return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
-		}
+			k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
+			if err != nil {
+				return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
+			}
 
-		var namespace string
+			var namespace string
 
-		if rootOpts.namespace != "" {
-			namespace = rootOpts.namespace
-		} else {
-			namespace = k8sclient.DefaultNamespace()
-		}
+			if rootOpts.namespace != "" {
+				namespace = rootOpts.namespace
+			} else {
+				namespace = k8sclient.DefaultNamespace()
+			}
 
-		return runList(ctx, k8sclient, namespace, args, os.Stdout)
-	},
+			return runList(ctx, k8sclient, namespace, args, out)
+		},
+	}
+
+	listCmd.Flags().BoolVar(&listOpts.base64encode, "base64", false, "Show values as base64-encoded string")
+
+	return listCmd
 }
 
 type Secret struct {
@@ -150,8 +154,4 @@ func runList(ctx context.Context, k8sclient client.Client, namespace string, arg
 	w.Flush()
 
 	return nil
-}
-
-func init() {
-	listCmd.Flags().BoolVar(&listOpts.base64encode, "base64", false, "Show values as base64-encoded string")
 }
