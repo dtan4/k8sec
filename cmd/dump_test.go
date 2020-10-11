@@ -12,17 +12,15 @@ import (
 
 func TestRunDump(t *testing.T) {
 	testcases := map[string]struct {
-		base64encode bool
-		args         []string
-		secret       *v1.Secret
-		secrets      *v1.SecretList
-		err          error
-		wantOut      string
-		wantErr      error
+		args    []string
+		secret  *v1.Secret
+		secrets *v1.SecretList
+		err     error
+		wantOut string
+		wantErr error
 	}{
 		"no secret arg": {
-			base64encode: false,
-			args:         []string{},
+			args: []string{},
 			secrets: &v1.SecretList{
 				Items: []v1.Secret{
 					{
@@ -65,8 +63,7 @@ token="thisistoken"
 		},
 
 		"one secret arg": {
-			base64encode: false,
-			args:         []string{"rails"},
+			args: []string{"rails"},
 			secret: &v1.Secret{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "rails",
