@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -14,7 +15,7 @@ var rootOpts = struct {
 	namespace  string
 }{}
 
-func newRootCmd(args []string) *cobra.Command {
+func newRootCmd(out io.Writer, args []string) *cobra.Command {
 	cmd := &cobra.Command{
 		SilenceUsage:  true,
 		SilenceErrors: true,
@@ -46,8 +47,8 @@ func newRootCmd(args []string) *cobra.Command {
 
 // Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute(args []string) {
-	cmd := newRootCmd(args)
+func Execute(out io.Writer, args []string) {
+	cmd := newRootCmd(out, args)
 
 	if err := cmd.Execute(); err != nil {
 		if rootOpts.debug {
