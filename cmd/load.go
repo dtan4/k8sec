@@ -17,7 +17,7 @@ type loadOpts struct {
 	filename string
 }
 
-func newLoadCmd(out io.Writer) *cobra.Command {
+func newLoadCmd(in io.Reader, out io.Writer) *cobra.Command {
 	opts := loadOpts{}
 
 	loadCmd := &cobra.Command{
@@ -53,7 +53,7 @@ $ cat .env | k8sec load rails
 				namespace = k8sclient.DefaultNamespace()
 			}
 
-			return runLoad(ctx, k8sclient, namespace, args, os.Stdin, os.Stdout, &opts)
+			return runLoad(ctx, k8sclient, namespace, args, in, out, &opts)
 		},
 	}
 

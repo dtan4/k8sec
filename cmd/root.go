@@ -15,7 +15,7 @@ var rootOpts = struct {
 	namespace  string
 }{}
 
-func newRootCmd(out io.Writer, args []string) *cobra.Command {
+func newRootCmd(in io.Reader, out io.Writer, args []string) *cobra.Command {
 	cmd := &cobra.Command{
 		SilenceUsage:  true,
 		SilenceErrors: true,
@@ -37,7 +37,7 @@ func newRootCmd(out io.Writer, args []string) *cobra.Command {
 
 	cmd.AddCommand(dumpCmd)
 	cmd.AddCommand(listCmd)
-	cmd.AddCommand(newLoadCmd(out))
+	cmd.AddCommand(newLoadCmd(in, out))
 	cmd.AddCommand(newSetCmd(out))
 	cmd.AddCommand(newUnsetCmd(out))
 	cmd.AddCommand(versionCmd)
@@ -47,8 +47,8 @@ func newRootCmd(out io.Writer, args []string) *cobra.Command {
 
 // Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute(out io.Writer, args []string) {
-	cmd := newRootCmd(out, args)
+func Execute(in io.Reader, out io.Writer, args []string) {
+	cmd := newRootCmd(in, out, args)
 
 	if err := cmd.Execute(); err != nil {
 		if rootOpts.debug {
