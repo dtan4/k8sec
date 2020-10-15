@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/dtan4/k8sec/client"
+	"github.com/dtan4/k8sec/pkg/client"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
