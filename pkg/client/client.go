@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 
+	"github.com/dtan4/k8sec/version"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -40,6 +41,8 @@ func New(kubeconfig, context string) (*clientImpl, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	config.UserAgent = version.UserAgent()
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
