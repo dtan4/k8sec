@@ -1,4 +1,22 @@
-# [v0.6.0](https://github.com/dtan4/k8sec/releases/tag/v0.5.1) (2018-08-05)
+# [v0.8.0](https://github.com/dtan4/k8sec/releases/tag/v0.7.0) (2020-03-13)
+
+## Features
+
+- Customize User-Agent with k8sec version ([#153](https://github.com/dtan4/k8sec/pull/153)) (thanks @bendrucker)
+
+## Others
+
+- Use Go 1.17
+- Update dependencies including some security fixes
+- Stop providing official Docker image
+- Drop support under Kubernetes 1.18 (see also: [Kubernetes version skew policy](https://kubernetes.io/releases/version-skew-policy/))
+
+# [v0.7.0](https://github.com/dtan4/k8sec/releases/tag/v0.7.0) (2020-03-13)
+
+- Use Go 1.14
+- Update dependencies to the latest one (e.g. client-go v0.17.3)
+
+# [v0.6.0](https://github.com/dtan4/k8sec/releases/tag/v0.6.0) (2018-08-05)
 
 ## Features
 
