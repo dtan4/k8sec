@@ -32,7 +32,7 @@ archives:
 release:
   prerelease: auto
 brews:
-- github:
+- tap:
     owner: dtan4
     name: homebrew-tools
   folder: Formula
