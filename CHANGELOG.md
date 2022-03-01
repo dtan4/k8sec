@@ -1,4 +1,4 @@
-# [v0.8.0](https://github.com/dtan4/k8sec/releases/tag/v0.7.0) (2020-03-13)
+# [v0.8.0](https://github.com/dtan4/k8sec/releases/tag/v0.8.0) (2022-03-02)
 
 ## Features
 
