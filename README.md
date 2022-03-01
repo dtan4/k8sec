@@ -38,7 +38,12 @@ $ make install
 
 ### Docker image
 
-Docker image is available at [`quay.io/dtan4/k8sec`](https://quay.io/repository/dtan4/k8sec).
+Docker image is no longer provided officially.
+If you'd like to run k8sec in Docker image, see [`Dockerfile`](Dockerfile) and build image by yourself.
+
+```bash
+docker build -t k8sec .
+```
 
 ## Usage
 

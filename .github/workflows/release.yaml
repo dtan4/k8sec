@@ -14,12 +14,6 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: 1.17
-      - name: Log in to quay.io
-        uses: Azure/docker-login@v1
-        with:
-          login-server: quay.io
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
