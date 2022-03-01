@@ -41,9 +41,6 @@ brews:
   skip_upload: auto # skip if the version is rc (e.g. v1.0.0-rc1)
   test: |
     system "#{bin}/k8sec", "version"
-dockers:
-  - image_templates:
-    - "quay.io/dtan4/k8sec:{{ .Tag }}"
 checksum:
   name_template: 'checksums.txt'
 snapshot:
