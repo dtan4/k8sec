@@ -5,8 +5,8 @@ go 1.17
 require (
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.3.0
-	k8s.io/api v0.23.4
-	k8s.io/apimachinery v0.23.4
+	k8s.io/api v0.23.5
+	k8s.io/apimachinery v0.23.5
 	k8s.io/client-go v0.23.4
 )
 
