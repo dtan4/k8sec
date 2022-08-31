@@ -9,6 +9,9 @@
   "ignorePaths": [
     "Dockerfile"
   ],
+  "ignoreDeps": [
+    "go"
+  ],
   "packageRules": [
     {
       "matchUpdateTypes": [
