@@ -2,5 +2,25 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:base"
-  ]
+  ],
+  "postUpdateOptions": [
+    "gomodTidy"
+  ],
+  "ignorePaths": [
+    "Dockerfile"
+  ],
+  "packageRules": [
+    {
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ],
+      "automerge": true
+    }
+  ],
+  "constraints": {
+    "go": "1.17"
+  }
 }
