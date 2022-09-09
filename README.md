@@ -17,8 +17,8 @@ Kubernetes 1.18 or above
 Formula is available at [dtan4/homebrew-dtan4](https://github.com/dtan4/homebrew-tools).
 
 ```bash
-$ brew tap dtan4/tools
-$ brew install k8sec
+brew tap dtan4/tools
+brew install k8sec
 ```
 
 ### Precompiled binary
@@ -27,11 +27,10 @@ Precompiled binaries for Windows, OS X, Linux are available at [Releases](https:
 
 ### From source
 
-```bash
-$ go get -d github.com/dtan4/k8sec
-$ cd $GOPATH/src/github.com/dtan4/k8sec
-$ make deps
-$ make install
+```sh-session
+go get -d github.com/dtan4/k8sec
+cd $GOPATH/src/github.com/dtan4/k8sec
+make install
 ```
 
 ### Docker image
@@ -58,7 +57,7 @@ docker build -t k8sec .
 
 List secrets
 
-```bash
+```sh-session
 $ k8sec list [--base64] [NAME]
 
 # Example
@@ -76,7 +75,7 @@ rails   Opaque  database-url    cG9zdGdyZXM6Ly9leGFtcGxlLmNvbTo1NDMyL2RibmFtZQ==
 
 Set secrets
 
-```bash
+```sh-session
 $ k8sec set [--base64] NAME KEY1=VALUE1 [KEY2=VALUE2 ...]
 
 $ k8sec set rails rails-env=production
@@ -99,7 +98,7 @@ rails   Opaque  foo             "dtan4"
 
 Unset secrets
 
-```bash
+```sh-session
 $ k8sec unset NAME KEY1 KEY2...
 
 # Example
@@ -110,7 +109,7 @@ $ k8sec unset rails rails-env
 
 Load secrets from dotenv (key=value) format text
 
-```bash
+```sh-session
 $ k8sec load [-f FILENAME] NAME
 
 # Example
@@ -126,7 +125,7 @@ $ cat .env | k8sec load rails
 
 Dump secrets as dotenv (key=value) format
 
-```bash
+```sh-session
 $ k8sec dump [-f FILENAME] [--noquotes] [NAME]
 
 # Example
@@ -137,7 +136,6 @@ database-url="postgres://example.com:5432/dbname"
 $ k8sec dump -f .env rails
 $ cat .env
 database-url="postgres://example.com:5432/dbname"
-```
 
 # Save as .env without qoutes
 $ k8sec dump -f .env --noquotes rails
@@ -146,8 +144,6 @@ database-url=postgres://example.com:5432/dbname
 ```
 
 ## Contribution
-
-Go 1.8 or above is required.
 
 1. Fork ([https://github.com/dtan4/k8sec/fork](https://github.com/dtan4/k8sec/fork))
 1. Create a feature branch
