@@ -12,6 +12,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - uses: actions/cache@v3
         with:
           path: |
@@ -20,11 +21,23 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
+
       - name: Setup Go
         uses: actions/setup-go@v3
         with:
           go-version: 1.19
+
       - name: Run tests
         run: make ci-test
+
       - name: Send test coverage to Codecov
         uses: codecov/codecov-action@v3
+
+      - name: Run Trivy vulnerability scanner in repo mode
+        uses: aquasecurity/trivy-action@0.7.1
+        with:
+          scan-type: "fs"
+          ignore-unfixed: true
+          vuln-type: "os,library"
+          severity: "CRITICAL,HIGH"
+          exit-code: "1"
