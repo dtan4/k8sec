@@ -13,19 +13,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
       - name: Setup Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.19
+          cache: true
+          go-version-file: "go.mod"
 
       - name: Run tests
         run: make ci-test
