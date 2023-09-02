@@ -26,7 +26,7 @@ jobs:
         uses: codecov/codecov-action@v3
 
       - name: Run Trivy vulnerability scanner in repo mode
-        uses: aquasecurity/trivy-action@0.11.2
+        uses: aquasecurity/trivy-action@0.12.0
         with:
           scan-type: "fs"
           ignore-unfixed: true
