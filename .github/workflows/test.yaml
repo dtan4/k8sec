@@ -23,7 +23,7 @@ jobs:
         run: make ci-test
 
       - name: Send test coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
 
       - name: Run Trivy vulnerability scanner in repo mode
         uses: aquasecurity/trivy-action@0.12.0
