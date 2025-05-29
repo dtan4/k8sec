@@ -10,7 +10,6 @@ import (
 
 var rootOpts = struct {
 	context    string
-	debug      bool
 	kubeconfig string
 	namespace  string
 }{}
@@ -29,7 +28,6 @@ func newRootCmd(in io.Reader, out io.Writer, args []string) *cobra.Command {
 	flags := cmd.PersistentFlags()
 
 	flags.StringVar(&rootOpts.context, "context", "", "Kubernetes context")
-	flags.BoolVar(&rootOpts.debug, "debug", false, "Debug mode")
 	flags.StringVar(&rootOpts.kubeconfig, "kubeconfig", "", "Path of kubeconfig")
 	flags.StringVarP(&rootOpts.namespace, "namespace", "n", "", "Kubernetes namespace")
 
@@ -49,11 +47,7 @@ func Execute(in io.Reader, out io.Writer, args []string) {
 	cmd := newRootCmd(in, out, args)
 
 	if err := cmd.Execute(); err != nil {
-		if rootOpts.debug {
-			fmt.Printf("%+v\n", err)
-		} else {
-			fmt.Println(err)
-		}
-		os.Exit(-1)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }
