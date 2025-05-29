@@ -3,7 +3,7 @@ package cmd
 import (
 	"bytes"
 	"context"
-	"fmt"
+	"errors"
 	"io"
 	"os"
 	"path/filepath"
@@ -67,8 +67,8 @@ token="thisistoken"
 			args:     []string{},
 			filename: "",
 			noquotes: false,
-			err:      fmt.Errorf("cannot retrieve secret rails"),
-			wantErr:  fmt.Errorf("Failed to list secret.: cannot retrieve secret rails"),
+			err:      errors.New("cannot retrieve secret rails"),
+			wantErr:  errors.New("list secret: cannot retrieve secret rails"),
 		},
 
 		"one secret arg": {
@@ -135,8 +135,8 @@ token=thisistoken
 			args:     []string{"rails"},
 			filename: "",
 			noquotes: false,
-			err:      fmt.Errorf("cannot retrieve secret rails"),
-			wantErr:  fmt.Errorf("Failed to get secret. name=rails: cannot retrieve secret rails"),
+			err:      errors.New("cannot retrieve secret rails"),
+			wantErr:  errors.New(`get secret "rails": cannot retrieve secret rails`),
 		},
 	}
 

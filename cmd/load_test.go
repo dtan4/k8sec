@@ -3,7 +3,7 @@ package cmd
 import (
 	"bytes"
 	"context"
-	"fmt"
+	"errors"
 	"strings"
 	"testing"
 
@@ -58,8 +58,8 @@ rails-env="production"`,
 			args: []string{
 				"rails",
 			},
-			err:     fmt.Errorf("cannot list secret"),
-			wantErr: fmt.Errorf("Failed to get secret. name=rails: cannot list secret"),
+			err:     errors.New("cannot list secret"),
+			wantErr: errors.New(`get secret "rails": cannot list secret`),
 		},
 	}
 
