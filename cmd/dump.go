@@ -3,6 +3,7 @@ package cmd
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -10,7 +11,6 @@ import (
 	"strconv"
 
 	"github.com/dtan4/k8sec/pkg/client"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -44,14 +44,14 @@ database-url=postgres://example.com:5432/dbname
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 1 {
-				return errors.New("Too many arguments.")
+				return errors.New("too many arguments")
 			}
 
 			ctx := context.Background()
 
 			k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
 			if err != nil {
-				return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
+				return fmt.Errorf("initialize Kubernetes API client: %w", err)
 			}
 
 			var namespace string
@@ -78,7 +78,7 @@ func runDump(ctx context.Context, k8sclient client.Client, namespace string, arg
 	if len(args) == 1 {
 		secret, err := k8sclient.GetSecret(ctx, namespace, args[0])
 		if err != nil {
-			return errors.Wrapf(err, "Failed to get secret. name=%s", args[0])
+			return fmt.Errorf("get secret %q: %w", args[0], err)
 		}
 
 		for key, value := range secret.Data {
@@ -91,7 +91,7 @@ func runDump(ctx context.Context, k8sclient client.Client, namespace string, arg
 	} else {
 		secrets, err := k8sclient.ListSecrets(ctx, namespace)
 		if err != nil {
-			return errors.Wrap(err, "Failed to list secret.")
+			return fmt.Errorf("list secret: %w", err)
 		}
 
 		for _, secret := range secrets.Items {
@@ -110,7 +110,7 @@ func runDump(ctx context.Context, k8sclient client.Client, namespace string, arg
 	if opts.filename != "" {
 		f, err := os.Create(opts.filename)
 		if err != nil {
-			return errors.Wrapf(err, "Failed to open file. filename=%s", opts.filename)
+			return fmt.Errorf("open file %q: %w", opts.filename, err)
 		}
 		defer f.Close()
 
@@ -119,7 +119,7 @@ func runDump(ctx context.Context, k8sclient client.Client, namespace string, arg
 		for _, line := range lines {
 			_, err := w.WriteString(line + "\n")
 			if err != nil {
-				return errors.Wrapf(err, "Failed to write to file. filename=%s", opts.filename)
+				return fmt.Errorf("write to file %q: %w", opts.filename, err)
 			}
 		}
 

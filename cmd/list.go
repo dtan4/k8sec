@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"io"
 	"sort"
@@ -11,7 +12,6 @@ import (
 	"text/tabwriter"
 
 	"github.com/dtan4/k8sec/pkg/client"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -39,14 +39,14 @@ rails   Opaque  database-url    cG9zdGdyZXM6Ly9leGFtcGxlLmNvbTo1NDMyL2RibmFtZQ==
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 1 {
-				return errors.New("Too many arguments.")
+				return errors.New("too many arguments")
 			}
 
 			ctx := context.Background()
 
 			k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
 			if err != nil {
-				return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
+				return fmt.Errorf("initialize Kubernetes API client: %w", err)
 			}
 
 			var namespace string
@@ -85,7 +85,7 @@ func runList(ctx context.Context, k8sclient client.Client, namespace string, arg
 	if len(args) == 1 {
 		secret, err := k8sclient.GetSecret(ctx, namespace, args[0])
 		if err != nil {
-			return errors.Wrap(err, "Failed to retrieve secrets.")
+			return fmt.Errorf("get secret %q: %w", args[0], err)
 		}
 
 		for key, value := range secret.Data {
@@ -110,7 +110,7 @@ func runList(ctx context.Context, k8sclient client.Client, namespace string, arg
 	} else {
 		ss, err := k8sclient.ListSecrets(ctx, namespace)
 		if err != nil {
-			return errors.Wrap(err, "Failed to retrieve secrets.")
+			return fmt.Errorf("list secrets: %w", err)
 		}
 
 		for _, secret := range ss.Items {

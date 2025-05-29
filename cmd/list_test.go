@@ -3,7 +3,7 @@ package cmd
 import (
 	"bytes"
 	"context"
-	"fmt"
+	"errors"
 	"testing"
 
 	v1 "k8s.io/api/core/v1"
@@ -61,8 +61,8 @@ rails			Opaque					rails-env	"production"
 
 		"no secret arg and error": {
 			args:    []string{},
-			err:     fmt.Errorf("cannot retrieve secret rails"),
-			wantErr: fmt.Errorf("Failed to retrieve secrets.: cannot retrieve secret rails"),
+			err:     errors.New("cannot retrieve secret rails"),
+			wantErr: errors.New("list secrets: cannot retrieve secret rails"),
 		},
 
 		"one secret arg": {
@@ -109,8 +109,8 @@ rails	Opaque	rails-env	cHJvZHVjdGlvbg==
 
 		"one secret and error": {
 			args:    []string{"rails"},
-			err:     fmt.Errorf("cannot retrieve secret rails"),
-			wantErr: fmt.Errorf("Failed to retrieve secrets.: cannot retrieve secret rails"),
+			err:     errors.New("cannot retrieve secret rails"),
+			wantErr: errors.New(`get secret "rails": cannot retrieve secret rails`),
 		},
 	}
 

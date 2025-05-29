@@ -3,13 +3,14 @@ package cmd
 import (
 	"bufio"
 	"context"
+	"errors"
+	"fmt"
 	"io"
 	"os"
 	"strconv"
 	"strings"
 
 	"github.com/dtan4/k8sec/pkg/client"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -35,14 +36,14 @@ $ cat .env | k8sec load rails
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) != 1 {
-				return errors.New("Variable name must be specified.")
+				return fmt.Errorf("variable name must be specified.")
 			}
 
 			ctx := context.Background()
 
 			k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
 			if err != nil {
-				return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
+				return fmt.Errorf("initialize Kubernetes API client: %w", err)
 			}
 
 			var namespace string
@@ -64,7 +65,7 @@ $ cat .env | k8sec load rails
 
 func runLoad(ctx context.Context, k8sclient client.Client, namespace string, args []string, in io.Reader, out io.Writer, opts *loadOpts) error {
 	if len(args) != 1 {
-		return errors.New("Variable name must be specified.")
+		return fmt.Errorf("Variable name must be specified.")
 	}
 	name := args[0]
 
@@ -74,7 +75,7 @@ func runLoad(ctx context.Context, k8sclient client.Client, namespace string, arg
 	if opts.filename != "" {
 		f, err := os.Open(opts.filename)
 		if err != nil {
-			return errors.Wrapf(err, "Failed to open file. filename=%s", opts.filename)
+			return fmt.Errorf("open file %q: %w", opts.filename, err)
 		}
 		defer f.Close()
 
@@ -88,7 +89,7 @@ func runLoad(ctx context.Context, k8sclient client.Client, namespace string, arg
 		ary := strings.SplitN(line, "=", 2)
 
 		if len(ary) != 2 {
-			return errors.Errorf("Line should be key=value format. line=%q", line)
+			return errors.New("line must be key=value format")
 		}
 
 		k, v := ary[0], ary[1]
@@ -104,7 +105,7 @@ func runLoad(ctx context.Context, k8sclient client.Client, namespace string, arg
 
 	s, err := k8sclient.GetSecret(ctx, namespace, name)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to get secret. name=%s", name)
+		return fmt.Errorf("get secret %q: %w", name, err)
 	}
 
 	for k, v := range data {
@@ -113,7 +114,7 @@ func runLoad(ctx context.Context, k8sclient client.Client, namespace string, arg
 
 	_, err = k8sclient.UpdateSecret(ctx, namespace, s)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to set secret. name=%s", name)
+		return fmt.Errorf("set secret %q: %w", name, err)
 	}
 
 	return nil

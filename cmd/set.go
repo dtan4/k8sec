@@ -3,12 +3,12 @@ package cmd
 import (
 	"context"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
 
 	"github.com/dtan4/k8sec/pkg/client"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	v1 "k8s.io/api/core/v1"
 )
@@ -46,14 +46,14 @@ rails   Opaque  foo             "dtan4"
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 2 {
-				return errors.New("Too few arguments.")
+				return fmt.Errorf("too few arguments")
 			}
 
 			ctx := context.Background()
 
 			k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
 			if err != nil {
-				return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
+				return fmt.Errorf("initialize Kubernetes API client: %w", err)
 			}
 
 			var namespace string
@@ -82,7 +82,7 @@ func runSet(ctx context.Context, k8sclient client.Client, namespace string, args
 		ary := strings.SplitN(kv, "=", 2)
 
 		if len(ary) != 2 {
-			return errors.Errorf("Argument should be in key=value format. argument=%q", kv)
+			return errors.New("argument should be in key=value format argument")
 		}
 
 		k, v := ary[0], ary[1]
@@ -90,7 +90,7 @@ func runSet(ctx context.Context, k8sclient client.Client, namespace string, args
 		if opts.base64encoded {
 			_v, err := base64.StdEncoding.DecodeString(v)
 			if err != nil {
-				return errors.Wrapf(err, "Failed to decode value as base64-encoded string. value=%q", v)
+				return fmt.Errorf("decode value as base64-encoded string: %w", err)
 			}
 
 			data[k] = _v
@@ -101,7 +101,7 @@ func runSet(ctx context.Context, k8sclient client.Client, namespace string, args
 
 	ss, err := k8sclient.ListSecrets(ctx, namespace)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to get current secret. name=%s", name)
+		return fmt.Errorf("get current secret %q: %w", name, err)
 	}
 
 	exists := false
@@ -118,7 +118,7 @@ func runSet(ctx context.Context, k8sclient client.Client, namespace string, args
 	if exists {
 		s, err = k8sclient.GetSecret(ctx, namespace, name)
 		if err != nil {
-			return errors.Wrapf(err, "Failed to get current secret. name=%s", name)
+			return fmt.Errorf("get current secret %q: %w", name, err)
 		}
 
 		if s.Data == nil {
@@ -131,7 +131,7 @@ func runSet(ctx context.Context, k8sclient client.Client, namespace string, args
 
 		_, err = k8sclient.UpdateSecret(ctx, namespace, s)
 		if err != nil {
-			return errors.Wrapf(err, "Failed to update secret. name=%s", name)
+			return fmt.Errorf("update secret %q: %w", name, err)
 		}
 	} else {
 		s = &v1.Secret{
@@ -141,7 +141,7 @@ func runSet(ctx context.Context, k8sclient client.Client, namespace string, args
 
 		_, err = k8sclient.CreateSecret(ctx, namespace, s)
 		if err != nil {
-			return errors.Wrapf(err, "Failed to create secret. name=%s", name)
+			return fmt.Errorf("create secret %q: %w", name, err)
 		}
 	}
 

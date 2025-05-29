@@ -3,7 +3,7 @@ package cmd
 import (
 	"bytes"
 	"context"
-	"fmt"
+	"errors"
 	"testing"
 
 	v1 "k8s.io/api/core/v1"
@@ -82,8 +82,8 @@ func TestRunSet(t *testing.T) {
 			secrets: &v1.SecretList{
 				Items: []v1.Secret{},
 			},
-			err:     fmt.Errorf("cannot list secret"),
-			wantErr: fmt.Errorf("Failed to get current secret. name=rails: cannot list secret"),
+			err:     errors.New("cannot list secret"),
+			wantErr: errors.New(`get current secret "rails": cannot list secret`),
 		},
 	}
 

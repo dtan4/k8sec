@@ -6,7 +6,6 @@ import (
 	"io"
 
 	"github.com/dtan4/k8sec/pkg/client"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -16,14 +15,14 @@ func newUnsetCmd(out io.Writer) *cobra.Command {
 		Short: "Unset secrets",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 2 {
-				return errors.New("Too few arguments.")
+				return fmt.Errorf("too few arguments")
 			}
 
 			ctx := context.Background()
 
 			k8sclient, err := client.New(rootOpts.kubeconfig, rootOpts.context)
 			if err != nil {
-				return errors.Wrap(err, "Failed to initialize Kubernetes API client.")
+				return fmt.Errorf("initialize Kubernetes API client: %w", err)
 			}
 
 			var namespace string
@@ -46,13 +45,13 @@ func runUnset(ctx context.Context, k8sclient client.Client, namespace string, ar
 
 	s, err := k8sclient.GetSecret(ctx, namespace, name)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to get current secret. name=%s", name)
+		return fmt.Errorf("get current secret %q: %w", name, err)
 	}
 
 	for _, k := range args[1:] {
 		_, ok := s.Data[k]
 		if !ok {
-			return errors.Errorf("The key %s does not exist.", k)
+			return fmt.Errorf("the key %s does not exist", k)
 		}
 
 		delete(s.Data, k)
@@ -60,7 +59,7 @@ func runUnset(ctx context.Context, k8sclient client.Client, namespace string, ar
 
 	_, err = k8sclient.UpdateSecret(ctx, namespace, s)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to unset secret. name=%s", name)
+		return fmt.Errorf("unset secret %q: %w", name, err)
 	}
 
 	fmt.Fprintln(out, s.Name)
