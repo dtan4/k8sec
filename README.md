@@ -33,15 +33,6 @@ cd $GOPATH/src/github.com/dtan4/k8sec
 make install
 ```
 
-### Docker image
-
-Docker image is no longer provided officially.
-If you'd like to run k8sec in Docker image, see [`Dockerfile`](Dockerfile) and build image by yourself.
-
-```bash
-docker build -t k8sec .
-```
-
 ## Usage
 
 ### Global options
