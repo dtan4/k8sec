@@ -1,15 +1,50 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
+    "config:recommended",
+    "schedule:weekly"
   ],
   "postUpdateOptions": [
     "gomodTidy"
   ],
-  "ignoreDeps": [
-    "go"
-  ],
   "packageRules": [
+    {
+      "matchDatasources": ["golang-version"],
+      "rangeStrategy": "bump"
+    },
+    {
+      "groupName": "all non-major Go dependencies",
+      "groupSlug": "all-minor-patch-gomod",
+      "matchManagers": [
+        "gomod"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ],
+      "automerge": true,
+      "automergeType": "branch",
+      "matchPackageNames": [
+        "!go"
+      ]
+    },
+    {
+      "groupName": "all non-major GitHub Actions dependencies",
+      "groupSlug": "all-minor-patch-github-actions",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ],
+      "automerge": true,
+      "automergeType": "branch"
+    },
     {
       "matchUpdateTypes": [
         "minor",
@@ -17,10 +52,8 @@
         "pin",
         "digest"
       ],
-      "automerge": true
+      "automerge": true,
+      "automergeType": "branch"
     }
-  ],
-  "constraints": {
-    "go": "1.19"
-  }
+  ]
 }
