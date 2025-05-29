@@ -1,7 +1,6 @@
 # k8sec
 
 [![GitHub Actions](https://github.com/dtan4/k8sec/workflows/Test/badge.svg)](https://github.com/dtan4/k8sec/actions?query=workflow%3ATest+branch%3Amaster)
-[![codecov](https://codecov.io/gh/dtan4/k8sec/branch/master/graph/badge.svg)](https://codecov.io/gh/dtan4/k8sec)
 [![GitHub release](https://img.shields.io/github/release/dtan4/k8sec.svg)](https://github.com/dtan4/k8sec/releases)
 
 CLI tool to manage [Kubernetes Secrets](http://kubernetes.io/docs/user-guide/secrets/) easily
