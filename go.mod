@@ -1,6 +1,6 @@
 module github.com/dtan4/k8sec
 
-go 1.24.6
+go 1.25.0
 
 require (
 	github.com/spf13/cobra v1.9.1
