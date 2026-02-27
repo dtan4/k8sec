@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"os"
 
 	"github.com/dtan4/k8sec/version"
 	v1 "k8s.io/api/core/v1"
@@ -29,7 +30,13 @@ type clientImpl struct {
 // New creates new Kubernetes API client
 func New(kubeconfig, context string) (*clientImpl, error) {
 	if kubeconfig == "" {
-		kubeconfig = clientcmd.RecommendedHomeFile
+		// First check KUBECONFIG environment variable
+		if envKubeconfig := os.Getenv("KUBECONFIG"); envKubeconfig != "" {
+			kubeconfig = envKubeconfig
+		} else {
+			// Fall back to default ~/.kube/config
+			kubeconfig = clientcmd.RecommendedHomeFile
+		}
 	}
 
 	clientConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(

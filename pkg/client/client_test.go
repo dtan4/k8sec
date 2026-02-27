@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"os"
 	"reflect"
 	"testing"
 
@@ -56,6 +57,71 @@ func TestCreateSecret(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestNew_KubeconfigEnvironment(t *testing.T) {
+	// Create a minimal valid kubeconfig content
+	kubeconfigContent := `apiVersion: v1
+kind: Config
+clusters:
+- cluster:
+    server: https://test-server:6443
+  name: test-cluster
+contexts:
+- context:
+    cluster: test-cluster
+    user: test-user
+  name: test-context
+current-context: test-context
+users:
+- name: test-user
+  user:
+    token: test-token
+`
+
+	// Create temporary kubeconfig file
+	tmpFile, err := os.CreateTemp("", "kubeconfig-test-")
+	if err != nil {
+		t.Fatalf("Failed to create temp file: %v", err)
+	}
+	defer os.Remove(tmpFile.Name())
+
+	if _, err := tmpFile.WriteString(kubeconfigContent); err != nil {
+		t.Fatalf("Failed to write to temp file: %v", err)
+	}
+	tmpFile.Close()
+
+	// Save original KUBECONFIG env var
+	originalKubeconfig := os.Getenv("KUBECONFIG")
+	defer func() {
+		if originalKubeconfig == "" {
+			os.Unsetenv("KUBECONFIG")
+		} else {
+			os.Setenv("KUBECONFIG", originalKubeconfig)
+		}
+	}()
+
+	// Test case 1: KUBECONFIG env var is used when no kubeconfig flag is provided
+	t.Run("uses KUBECONFIG env var", func(t *testing.T) {
+		os.Setenv("KUBECONFIG", tmpFile.Name())
+
+		// This should not fail if KUBECONFIG is properly read
+		_, err := New("", "test-context")
+		if err != nil {
+			t.Errorf("Expected New to succeed with KUBECONFIG env var, got error: %v", err)
+		}
+	})
+
+	// Test case 2: Explicit kubeconfig flag takes precedence over KUBECONFIG env var
+	t.Run("explicit kubeconfig overrides KUBECONFIG env var", func(t *testing.T) {
+		os.Setenv("KUBECONFIG", "/nonexistent/path")
+
+		// This should not fail because explicit kubeconfig should be used
+		_, err := New(tmpFile.Name(), "test-context")
+		if err != nil {
+			t.Errorf("Expected New to succeed with explicit kubeconfig, got error: %v", err)
+		}
+	})
 }
 
 func TestGetSecret(t *testing.T) {
