@@ -39,7 +39,7 @@ make install
 |Option|Description|Required|Default|
 |---------|-----------|-------|-------|
 |`--context=CONTEXT`|Kubernetes context|||
-|`--kubeconfig=KUBECONFIG`|Path of kubeconfig||`~/.kube/config`|
+|`--kubeconfig=KUBECONFIG`|Path of kubeconfig||`$KUBECONFIG` env var, then `~/.kube/config`|
 |`-n`, `--namespace=NAMESPACE`|Kubernetes namespace||`default`|
 |`-h`, `-help`|Print command line usage|||
 
